@@ -6,7 +6,6 @@ from customtkinter import *
 from PIL import Image, ImageTk
 from ttkbootstrap import Style
 
-
 def change_theme():
     if get_appearance_mode() == "Dark":
         set_appearance_mode("light")
