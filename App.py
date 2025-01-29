@@ -111,8 +111,8 @@ exitIcon = CTkImage(Image.open("images/exit.png"), size=(15, 15))
 
 
 #Side Menu----------------------------------------------------------------------
-sideMenu = CTkFrame(app, fg_color=bgColor, bg_color=bgColor, width=200, border_width=0)
-TitleFrame = CTkFrame(sideMenu, border_width=0, fg_color=bgColor, width=200)
+sideMenu = CTkFrame(app, fg_color=bgColor, bg_color=bgColor, border_width=0)
+TitleFrame = CTkFrame(sideMenu, border_width=0, fg_color=bgColor)
 sideTitle = CTkLabel(TitleFrame, text=" MaBibliotheque        ", font=("Arial", 20), fg_color=bgColor, justify="left", compound="left", anchor="w", bg_color=bgColor, image=logoImage)
 ThemeBtn = CTkButton(TitleFrame, text="", image=ThemeIcon, width=40, height=40, fg_color=mainColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), command=change_theme, border_width=1, border_color=("#e2e8f0","#27272a"))
 
