@@ -172,28 +172,28 @@ vBorder = CTkFrame(MainFrame, width=800, height=2, bg_color=("#e2e8f0", "#27272a
 mainContent = CTkFrame(main, border_width=0, fg_color=mainColor)
 dashboardContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-#Stats
+
 statsFrame = CTkFrame(dashboardContent, fg_color=mainColor)
 
-#Total Books
+
 totalBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(totalBooksFrame, text="Total Books", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(totalBooksFrame, text=totalBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
 CTkLabel(totalBooksFrame, text="+20% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a", "#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
-#Available Books
+
 availableBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(availableBooksFrame, text="Available Books", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(availableBooksFrame, text=availableBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
 CTkLabel(availableBooksFrame, text="+10% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
-#Borrowed Books
+
 borrowedBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(borrowedBooksFrame, text="Borrowed Books", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(borrowedBooksFrame, text=borrowedBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
 CTkLabel(borrowedBooksFrame, text="+10% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
-#Total Clients
+
 totalClientsFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(totalClientsFrame, text="Total Clients", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(totalClientsFrame, text=totalClients, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
