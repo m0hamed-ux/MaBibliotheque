@@ -4,8 +4,8 @@ from tkcalendar import *
 from tkinter import ttk
 from customtkinter import *
 from PIL import Image, ImageTk
-from ttkbootstrap import Style
 from Bilio import Biblio
+import json
 
 
 
@@ -18,6 +18,14 @@ availableBooks = 0
 borrowedBooks = 0
 totalClients = 0
 
+def defaultSettings():
+    with open("Database/settings.json", "r") as file:
+        data_dict = json.load(file)
+    if data_dict["theme"] == "light":
+        set_appearance_mode("light")
+    else:
+        set_appearance_mode("dark")
+    set_widget_scaling(data_dict["zoom"])
 def change_theme():
     if get_appearance_mode() == "Dark":
         set_appearance_mode("light")
@@ -102,7 +110,6 @@ def updateStats():
 set_appearance_mode("dark")
 currentFrame="Dashboard"
 app = CTk()
-style = Style(theme="cyborg")
 app.title("Bibliotheque")
 app.geometry("1000x600")
 app.iconbitmap("images/logo.ico")
@@ -216,9 +223,9 @@ class RecentActivity(CTkFrame):
         self.pack(side=TOP, fill=BOTH, expand=True, padx=5)
         self.activity = CTkLabel(self, text=text, font=font)
         self.activity.pack(side=LEFT, pady=2, padx=20, anchor="w", expand=False)
-        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
         self.delete = CTkButton(self, text="Delete", command=self.destroy, fg_color="red", bg_color=bgColor, border_width=0, text_color="#fff", font=("Arial", 15), cursor="hand2", image=exitIcon, compound="left", anchor="w", height=33, hover=False)
-        self.delete.pack(side=RIGHT, padx=5, pady=5)
+        self.delete.pack(side=RIGHT, padx=1, pady=1)
 for activity in recentActivities:
     RecentActivity(recentFrame, text=f"{activity['date']} - {activity['activity']} - {activity['user']}", font=("Arial", 15))
 
@@ -318,8 +325,11 @@ update_menu_colors()
 
 
 app.config(menu = menubar) 
-change_theme()
 updateStats()
 BtnColor("Dashboard")
 updateMain("Dashboard")
-app.mainloop()
+
+def mainloop():
+    app.mainloop()
+if __name__ == "__main__":
+    mainloop()
