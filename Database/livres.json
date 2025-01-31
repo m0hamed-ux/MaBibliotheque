@@ -1,0 +1,14 @@
+[
+    {
+        "code": "L1234",
+        "titre": "LIVRE",
+        "auteur": {
+            "nom": "ALi",
+            "prenom": "Mohamed",
+            "code": "A1234"
+        },
+        "nbr_ttl_exemplaire": 100,
+        "nbr_exemplaire_disponible": 97,
+        "nbrEmprunt": 3
+    }
+]

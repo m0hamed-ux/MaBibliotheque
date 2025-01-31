@@ -2,6 +2,7 @@ from termcolor import *
 from Bilio import *
 
 Bib = Biblio()
+Bib.load_data()
 while True:
     print(colored("\n-------------Menu-------------", "light_green"))
     print(colored('''1) Ajouter un livre

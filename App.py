@@ -6,17 +6,21 @@ from customtkinter import *
 from PIL import Image, ImageTk
 from Bilio import Biblio
 import json
+from Adherent import Adherent
 
+
+#Variables
 
 
 #Gestion
 gestion = Biblio()
+gestion.load_data()
+totalBooks = len(gestion.get_livres())
+availableBooks = len(gestion.get_available_books())
+borrowedBooks = len(gestion.get_borrowed_books())
+totalClients = len(gestion.get_all_clients())
+        
 
-#Variables
-totalBooks = 0
-availableBooks = 0
-borrowedBooks = 0
-totalClients = 0
 
 def defaultSettings():
     with open("Database/settings.json", "r") as file:
@@ -46,31 +50,35 @@ def hideShowSideBar():
         main.pack(side=LEFT, fill=BOTH, expand=YES)
         border.configure(cursor="sb_left_arrow")
 def BtnColor(button):
-    btnList = [dashboard, books, clients, AddBook, AddLoan, settings]
+    btnList = [dashboard, books, clients, AddBook, AddLoan, settings, Loans]
     for btn in btnList:
         if btn.cget("text").strip() == button:
             btn.configure(fg_color=btnActiveColor, hover=False)
         else:
             btn.configure(hover=True,fg_color=bgColor)
     global currentFrame
-    if button == "Dashboard":
-        TitleMain.configure(text="Dashboard")
-        currentFrame = "Dashboard"
-    elif button == "Books":
-        TitleMain.configure(text="Books")
-        currentFrame = "Books"
-    elif button == "Clients":
-        TitleMain.configure(text="Clients")
-        currentFrame = "Clients"
-    elif button == "Add a book":
-        TitleMain.configure(text="Add a book")
-        currentFrame = "Add a book"
-    elif button == "Add a loan":
-        TitleMain.configure(text="Add a loan")
-        currentFrame = "Add a loan"
-    elif button == "Settings":
-        TitleMain.configure(text="Settings")
-        currentFrame = "Settings"
+    if button == "Accueil":
+        TitleMain.configure(text="Accueil")
+        currentFrame = "Accueil"
+    elif button == "Livres":
+        TitleMain.configure(text="Livres")
+        currentFrame = "Livres"
+    elif button == "Adherents":
+        TitleMain.configure(text="Adherents")
+        currentFrame = "Adherents"
+    elif button == "Emprunts":
+        TitleMain.configure(text="Emprunts")
+        currentFrame = "Emprunts"
+    elif button == "Ajouter un livre":
+        TitleMain.configure(text="Ajouter un livre")
+        currentFrame = "Ajouter un livre"
+    elif button == "Ajouter un emprunt":
+        TitleMain.configure(text="Ajouter un emprunt")
+        currentFrame = "Ajouter un emprunt"
+    elif button == "Paramètres":
+        TitleMain.configure(text="Paramètres")
+        currentFrame = "Paramètres"
+
 
 
 def update_menu_colors():
@@ -95,7 +103,7 @@ def update_menu_colors():
                        activebackground=active_bg, activeforeground=active_fg,
                        font=menu_font, borderwidth=0, border=0)
 def updateMain(frame):
-    if frame == "Dashboard":
+    if frame == "Accueil":
         dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
     else:
         dashboardContent.pack_forget()
@@ -108,7 +116,7 @@ def updateStats():
 
 
 set_appearance_mode("dark")
-currentFrame="Dashboard"
+currentFrame="Accueil"
 app = CTk()
 app.title("Bibliotheque")
 app.geometry("1000x600")
@@ -147,13 +155,14 @@ ThemeBtn = CTkButton(TitleFrame, text="", image=ThemeIcon, width=40, height=40, 
 
 BtnFrame = CTkFrame(sideMenu, fg_color=bgColor, border_width=0)
 CTkLabel(BtnFrame, text="Menu", font=("Arial", 13, "bold"), bg_color=bgColor, justify="left", compound="left", anchor="w").pack(side=TOP, fill=X, padx=5, pady=0)
-dashboard = CTkButton(BtnFrame, text="  Dashboard", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=dashboardIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Dashboard") & updateMain("Dashboard"))
-books = CTkButton(BtnFrame, text="  Books", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=bookIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Books") & updateMain("Books"))
-clients = CTkButton(BtnFrame, text="  Clients", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=clientsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Clients") & updateMain("Clients"))
-AddBook = CTkButton(BtnFrame, text="  Add a book", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=plusIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Add a book") & updateMain("Add a book"))
-AddLoan = CTkButton(BtnFrame, text="  Add a loan", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Add a loan") & updateMain("Add a loan"))
-settings = CTkButton(BtnFrame, text="  Settings", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=settingsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Settings") & updateMain("Settings"))
-Exit = CTkButton(BtnFrame, text="  Exit", fg_color=bgColor, bg_color=bgColor, border_width=1, border_color="red", text_color=("red", "red"), font=("Arial", 15), cursor="hand2", image=exitIcon, compound="left", anchor="w", height=33, hover=False, command=lambda: app.destroy())
+dashboard = CTkButton(BtnFrame, text="  Accueil", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=dashboardIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Accueil") & updateMain("Accueil"))
+books = CTkButton(BtnFrame, text="  Livres", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=bookIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Livres") & updateMain("Livres"))
+clients = CTkButton(BtnFrame, text="  Adherents", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=clientsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Adherents") & updateMain("Adherents"))
+Loans = CTkButton(BtnFrame, text="  Emprunts", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Emprunts") & updateMain("Emprunts"))
+AddBook = CTkButton(BtnFrame, text="  Ajouter un livre", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=plusIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un livre") & updateMain("Ajouter un livre"))
+AddLoan = CTkButton(BtnFrame, text="  Ajouter un emprunt", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un emprunt") & updateMain("Ajouter un emprunt"))
+settings = CTkButton(BtnFrame, text="  Paramètres", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=settingsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Paramètres") & updateMain("Paramètres"))
+Exit = CTkButton(BtnFrame, text="  Quitter", fg_color=bgColor, bg_color=bgColor, border_width=1, border_color="red", text_color=("red", "red"), font=("Arial", 15), cursor="hand2", image=exitIcon, compound="left", anchor="w", height=33, hover=False, command=lambda: app.destroy())
 
 
 #border
@@ -170,53 +179,42 @@ expandBtn = CTkButton(FrameTitle, text="", image=expandIcon, width=40, height=40
 vBorder = CTkFrame(MainFrame, width=800, height=2, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a"))
 #-----Content
 mainContent = CTkFrame(main, border_width=0, fg_color=mainColor)
+
+#--------Dashboard------------------------------------------------------------------
 dashboardContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
 
 statsFrame = CTkFrame(dashboardContent, fg_color=mainColor)
 
 
 totalBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(totalBooksFrame, text="Total Books", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
+CTkLabel(totalBooksFrame, text="Total de livres", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(totalBooksFrame, text=totalBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(totalBooksFrame, text="+20% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a", "#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
+CTkLabel(totalBooksFrame, text="+20% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a", "#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
 
 availableBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(availableBooksFrame, text="Available Books", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
+CTkLabel(availableBooksFrame, text="Livres disponibles", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(availableBooksFrame, text=availableBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(availableBooksFrame, text="+10% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
+CTkLabel(availableBooksFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
 
 borrowedBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(borrowedBooksFrame, text="Borrowed Books", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
+CTkLabel(borrowedBooksFrame, text="Livres empruntés", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(borrowedBooksFrame, text=borrowedBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(borrowedBooksFrame, text="+10% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
+CTkLabel(borrowedBooksFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
 
 totalClientsFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(totalClientsFrame, text="Total Clients", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
+CTkLabel(totalClientsFrame, text="Total de clients", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
 CTkLabel(totalClientsFrame, text=totalClients, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(totalClientsFrame, text="+10% from last month", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
+CTkLabel(totalClientsFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
 #Recent Activity
-recentFrame = CTkScrollableFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), label_text="Recent Activity", label_font=("Arial", 20, "bold"), label_text_color=("#000", "#fff"), label_fg_color=("#fff", "#1e1e1e"), label_anchor="w")
-recentActivities = [
-    {"date": "2024-01-01", "activity": "Added a book", "user": "John Doe"},
-    {"date": "2024-01-02", "activity": "Added a loan", "user": "Jane Smith"},
-    {"date": "2024-01-03", "activity": "Added a client", "user": "Alice Johnson"},
-    {"date": "2024-01-04", "activity": "Added a book", "user": "Bob Brown"},
-    {"date": "2024-01-05", "activity": "Added a loan", "user": "Charlie Davis"},
-    {"date": "2024-01-01", "activity": "Added a book", "user": "John Doe"},
-    {"date": "2024-01-03", "activity": "Added a client", "user": "Alice Johnson"},
-    {"date": "2024-01-04", "activity": "Added a book", "user": "Bob Brown"},
-    {"date": "2024-01-05", "activity": "Added a loan", "user": "Charlie Davis"},
-    {"date": "2024-01-01", "activity": "Added a book", "user": "John Doe"},
-    {"date": "2024-01-02", "activity": "Added a loan", "user": "Jane Smith"},
-    {"date": "2024-01-03", "activity": "Added a client", "user": "Alice Johnson"},
-    {"date": "2024-01-04", "activity": "Added a book", "user": "Bob Brown"},
-    {"date": "2024-01-05", "activity": "Added a loan", "user": "Charlie Davis"},
-]
+recentFrame = CTkScrollableFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), label_text="Activité récente", label_font=("Arial", 20, "bold"), label_text_color=("#000", "#fff"), label_fg_color=("#fff", "#1e1e1e"), label_anchor="w")
+recentActivitiesFile = open("Database/recentActivities.txt", "r")
+recentActivities = recentActivitiesFile.readlines()
 class RecentActivity(CTkFrame):
     def __init__(self, parent, text, font, **kwargs):
         super().__init__(parent, **kwargs)
@@ -224,10 +222,10 @@ class RecentActivity(CTkFrame):
         self.activity = CTkLabel(self, text=text, font=font)
         self.activity.pack(side=LEFT, pady=2, padx=20, anchor="w", expand=False)
         self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-        self.delete = CTkButton(self, text="Delete", command=self.destroy, fg_color="red", bg_color=bgColor, border_width=0, text_color="#fff", font=("Arial", 15), cursor="hand2", image=exitIcon, compound="left", anchor="w", height=33, hover=False)
-        self.delete.pack(side=RIGHT, padx=1, pady=1)
 for activity in recentActivities:
-    RecentActivity(recentFrame, text=f"{activity['date']} - {activity['activity']} - {activity['user']}", font=("Arial", 15))
+    if activity != "\n":
+        RecentActivity(recentFrame, text=f"{activity}", font=("Arial", 15))
+recentActivitiesFile.close()
 
 
 
@@ -243,7 +241,9 @@ borrowedBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 totalClientsFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=5)
 top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
+#-----------------------------------------------------------------------------
 
+# Your Content here ----------------------------------------------------------------------
 
 #Position----------------------------------------------------------------------
 sideMenu.pack(side=LEFT, fill=Y)
@@ -254,11 +254,13 @@ BtnFrame.pack(side=TOP, fill=BOTH,expand=YES, padx=5, pady=0)
 dashboard.pack(side=TOP, fill=X, padx=5, pady=5)
 books.pack(side=TOP, fill=X, padx=5, pady=5)
 clients.pack(side=TOP, fill=X, padx=5, pady=5)
+Loans.pack(side=TOP, fill=X, padx=5, pady=5)
 AddBook.pack(side=TOP, fill=X, padx=5, pady=5)
 AddLoan.pack(side=TOP, fill=X, padx=5, pady=5)
 settings.pack(side=TOP, fill=X, padx=5, pady=5)
 Exit.pack(side=BOTTOM, fill=X, padx=5, pady=5)
 border.pack(side=LEFT, fill=Y)
+
 
 main.pack(side=LEFT, fill=BOTH, expand=YES)
 MainFrame.pack(side=TOP, fill=X)
@@ -276,24 +278,26 @@ mainContent.pack(side=TOP, fill=BOTH, expand=True, padx=10, pady=10)
 #Menu------------------------------------------------------
 menubar = Menu(app) 
 file = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='File', menu=file)
-file.add_command(label='New File', command=None)
+menubar.add_cascade(label='Fichier', menu=file)
+file.add_command(label='Enregistrer les livres csv', command=None)
+file.add_command(label='Enregistrer les emprunts csv', command=None)
+file.add_command(label='Enregistrer les adherents csv', command=None)
 file.add_separator()
-file.add_command(label='Exit', command=app.destroy)
+file.add_command(label='Quitter', command=app.destroy)
 
 edit = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Edit', menu=edit)
-edit.add_command(label='Cut', command=None)
-edit.add_command(label='Copy', command=None)
-edit.add_command(label='Paste', command=None)
-edit.add_command(label='Select All', command=None)
+menubar.add_cascade(label='Editer', menu=edit)
+edit.add_command(label='Couper', command=None)
+edit.add_command(label='Copier', command=None)
+edit.add_command(label='Coller', command=None)
+edit.add_command(label='Selectionner tout', command=None)
 edit.add_separator()
 edit.add_command(label='Find...', command=None)
 
 view = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='View', menu=view)
+menubar.add_cascade(label='Voir', menu=view)
 sideBarView = IntVar()
-view.add_checkbutton(label="Side Menu", command=hideShowSideBar, variable=sideBarView)
+view.add_checkbutton(label="Barre latérale", command=hideShowSideBar, variable=sideBarView)
 mode = Menu(view, tearoff=0)
 Modevr = StringVar()
 mode.add_radiobutton(label="Dark mode", variable=Modevr, value="Dark mode", command=lambda: set_appearance_mode("dark") & update_menu_colors())
@@ -307,13 +311,13 @@ zoom.add_radiobutton(label="100%", variable=ZoomInt, value=1, command=lambda: se
 zoom.add_radiobutton(label="120%", variable=ZoomInt, value=1.2, command=lambda: set_widget_scaling(1.2))
 zoom.add_radiobutton(label="150%", variable=ZoomInt, value=1.5, command=lambda: set_widget_scaling(1.5))
 ZoomInt.set(1)
-view.add_cascade(label="Mode", menu=mode)
+view.add_cascade(label="Thème", menu=mode)
 view.add_cascade(label="Zoom", menu=zoom)
 sideBarView.set(1)
 
 help_ = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Help', menu=help_)
-help_.add_command(label='Help', command=None)
+menubar.add_cascade(label='Aide', menu=help_)
+help_.add_command(label='Aide', command=None)
 
 app.config(menu=menubar)
 update_menu_colors()
@@ -325,9 +329,9 @@ update_menu_colors()
 
 
 app.config(menu = menubar) 
-updateStats()
-BtnColor("Dashboard")
-updateMain("Dashboard")
+
+BtnColor("Accueil")
+updateMain("Accueil")
 
 def mainloop():
     app.mainloop()

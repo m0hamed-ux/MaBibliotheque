@@ -1,7 +1,6 @@
 import re
 from Auteur import *
 class livre:
-    nbEmprunt = 0
     def __init__(self,code,titre,auteur,nbr_ttl_exemplaire,nbr_exemplaire_disponible):
         self.template=r"^L\d{4}$"
         if not re.match(self.template,code):
@@ -10,7 +9,7 @@ class livre:
             raise Exception("INVALIDE !!")
         elif (not isinstance(nbr_ttl_exemplaire,int)) or (not isinstance(nbr_exemplaire_disponible,int)):
             raise Exception("le nombre saisie doit etre un entier")
-        elif nbr_ttl_exemplaire < 0 or nbr_exemplaire_disponible < nbr_ttl_exemplaire:
+        elif nbr_ttl_exemplaire < 0 or nbr_exemplaire_disponible > nbr_ttl_exemplaire:
             raise Exception(" ERROR réviser les iformations donner !!")
         else:
             self.__code=code
@@ -18,7 +17,7 @@ class livre:
             self.__titre=titre
             self.__nbr_ttl_exemplaire=nbr_ttl_exemplaire
             self.__nbr_exemplaire_disponible=nbr_exemplaire_disponible
-            self.__nbrEmprunt = livre.nbEmprunt
+            self.__nbrEmprunt = 0
 
             
 
@@ -72,3 +71,37 @@ class livre:
         return self.get_nbr_exemplaire_disponible() > 0
     def __str__(self):
         return f"---------Livre {self.__code}--------- \n├── Titre : {self.__titre}.\n├── Auteur : {self.__auteur}.\n├── Le nombre total des exemplaires : {self.__nbr_ttl_exemplaire}.\n├── Le nombre des exemplaires disponibles : {self.__nbr_exemplaire_disponible}\n├── Nombre des emprunts : {self.getNbrEmprunt()}"
+    def to_dict(self):
+        """Convert the book object to a dictionary for JSON serialization"""
+        return {
+            "code": self.__code,
+            "titre": self.__titre,
+            "auteur": self.__auteur.to_dict(),
+            "nbr_ttl_exemplaire": self.__nbr_ttl_exemplaire,
+            "nbr_exemplaire_disponible": self.__nbr_exemplaire_disponible,
+            "nbrEmprunt": self.__nbrEmprunt
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a livre instance from a dictionary"""
+        # Create Auteur instance from the nested author data
+        auteur_data = data["auteur"]
+        auteur = Auteur(
+            nom=auteur_data["nom"],
+            prenom=auteur_data["prenom"],
+            code=auteur_data["code"]
+        )
+        
+        # Create the livre instance
+        livre_instance = cls(
+            code=data["code"],
+            titre=data["titre"],
+            auteur=auteur,
+            nbr_ttl_exemplaire=int(data["nbr_ttl_exemplaire"]),
+            nbr_exemplaire_disponible=int(data["nbr_exemplaire_disponible"])
+        )
+        
+        # Set the nbrEmprunt value after creation using direct attribute access
+        livre_instance._livre__nbrEmprunt = int(data.get("nbrEmprunt", 0))
+        return livre_instance

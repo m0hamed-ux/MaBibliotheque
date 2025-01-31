@@ -1,0 +1,14 @@
+[
+    {
+        "nom": "Allali",
+        "prenom": "Ahmed",
+        "dateAdhesion": "2020-01-01",
+        "code": 1
+    },
+    {
+        "nom": "Kadiri",
+        "prenom": "Ali",
+        "dateAdhesion": "2022-01-01",
+        "code": 2
+    }
+]

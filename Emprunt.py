@@ -77,4 +77,24 @@ class Emprunt:
             etat = "non rendu"
         return etat
     def __str__(self):
-        return f"------Emprunt N° : {self.__code}------\n├── Livre : {self.__livreEmprunte.get_code()}\n├── Emprunteur : {self.__EmprunteurLivre.getCode()}\n├── la date d’emprunt : {self.__dateEmprunt}\n├── la date de retour prévue : {self.__dateRetourPrevue}\n├── la date de retour effective : {self.__dateRetourEffective}\n├── Etat : {self.etatEmprunt()}"
+        return f"------Emprunt N° : {self.__code}------\n├── Livre : {self.__livreEmprunte.get_code()}\n├── Emprunteur : {self.__EmprunteurLivre.getCode()}\n├── la date d'emprunt : {self.__dateEmprunt}\n├── la date de retour prévue : {self.__dateRetourPrevue}\n├── la date de retour effective : {self.__dateRetourEffective}\n├── Etat : {self.etatEmprunt()}"
+    def to_dict(self):
+        return {
+            "code": self.__code,
+            "livreEmprunte": self.__livreEmprunte.to_dict(),
+            "EmprunteurLivre": self.__EmprunteurLivre.to_dict(),
+            "dateEmprunt": self.__dateEmprunt.strftime('%Y-%m-%d'),
+            "dateRetourPrevue": self.__dateRetourPrevue.strftime('%Y-%m-%d'),
+            "dateRetourEffective": self.__dateRetourEffective.strftime('%Y-%m-%d') if self.__dateRetourEffective else None
+        }
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            livreEmprunte=livre.from_dict(data["livreEmprunte"]),
+            # get the code of the adherent from Adherent.json
+
+            EmprunteurLivre=Adherent.from_dict(data["EmprunteurLivre"]),
+            dateEmprunt=datetime.strptime(data["dateEmprunt"], '%Y-%m-%d').date(),
+            dateRPrevue=datetime.strptime(data["dateRetourPrevue"], '%Y-%m-%d').date(),
+            dateREffective=datetime.strptime(data["dateRetourEffective"], '%Y-%m-%d').date() if data["dateRetourEffective"] else None
+        )
