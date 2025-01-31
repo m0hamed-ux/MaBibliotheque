@@ -4,7 +4,7 @@ from Auteur import *
 from Emprunt import *
 from datetime import date
 import json
-
+import csv
 class Biblio:
     def __init__(self):
         self.__livres={}
@@ -72,8 +72,8 @@ class Biblio:
         with open("Database/livres.json", "w") as f:
             json.dump(livres, f, indent=4)
         # update recent activities
-        f = open("Database/recentActivities", "a")
-        f.write(f"Le livre {lvr.get_titre()} a été ajouté le {date.today().strftime('%d/%m/%Y')}\n")
+        f = open("Database/recentActivities.txt", "a")
+        f.write(f"Le livre {lvr.get_titre()} a ete ajoute le {date.today().strftime('%d/%m/%Y')}\n")
         f.close()
     def ajouterAdherent(self):
         print("---Saisir les information de l'adherent :---")
@@ -91,8 +91,8 @@ class Biblio:
             Adh = Adherent(nom, prenom, dateAdhesion)
             self.__adherents[Adh.getCode()] = Adh
             # update recent activities
-            f = open("Database/recentActivities", "a")
-            f.write(f"L'adherent {Adh.get_nom()} {Adh.get_prenomm()} a été ajouté le {dateAdhesion.strftime('%d/%m/%Y')}\n")
+            f = open("Database/recentActivities.txt", "a")
+            f.write(f"L'adherent {Adh.get_nom()} {Adh.get_prenomm()} a ete ajoute le {dateAdhesion.strftime('%d/%m/%Y')}\n")
             f.close()
             try:
                 with open("Database/adherent.json", "r") as f:
@@ -131,8 +131,8 @@ class Biblio:
             with open("Database/emprunts.json", "w") as f:
                 json.dump(emprunts, f, indent=4)
             # update recent activities
-            f = open("Database/recentActivities", "a")
-            f.write(f"L'adherent {adherent.getCode()} a emprunté le livre {livre.get_code()} le {dateEmprunt.strftime('%d/%m/%Y')}\n")
+            f = open("Database/recentActivities.txt", "a")
+            f.write(f"L'adherent {adherent.getCode()} a emprunte le livre {livre.get_code()} le {dateEmprunt.strftime('%d/%m/%Y')}\n")
             f.close()
         self.save_data()
 
@@ -198,4 +198,54 @@ class Biblio:
         return self.__adherents
     def get_all_emprunts(self):
         return list(self.__emprunts.values())
-
+    def TopLivres(self):
+        return sorted(self.__livres.values(), key=lambda x: x.getNbrEmprunt(), reverse=True)
+    def save_livres_csv(self):
+        try:
+            with open("Database/CSV/livres.csv", "w", newline='', encoding='utf-8') as f:
+                fieldnames = ["Code", "Titre", "Auteur", "Nombre total d'exemplaires", "Nombre d'exemplaires disponibles", "Nombre d'emprunts"]
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                for livre in self.__livres.values():
+                    writer.writerow({
+                        "Code": livre.get_code(),
+                        "Titre": livre.get_titre(),
+                        "Auteur": livre.get_auteur().get_nom(),
+                        "Nombre total d'exemplaires": livre.get_nbr_ttl_exemplaire(),
+                        "Nombre d'exemplaires disponibles": livre.get_nbr_exemplaire_disponible(),
+                        "Nombre d'emprunts": livre.getNbrEmprunt()
+                    })
+        except Exception as e:
+            print(f"Erreur lors de la sauvegarde des livres: {e}")
+    def save_emprunts_csv(self):
+        try:
+            with open("Database/CSV/emprunts.csv", "w", newline='', encoding='utf-8') as f:
+                fieldnames = ["Code", "Livre", "Adherent", "Date d'emprunt", "Date de retour prevue", "Date de retour effective"]
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                for emprunt in self.__emprunts.values():
+                    writer.writerow({
+                        "Code": emprunt.getCode(),
+                        "Livre": emprunt.getLivreEmprunte().get_code(),
+                        "Adherent": emprunt.getEmprunteurLivre().getCode(),
+                        "Date d'emprunt": emprunt.getDateEmprunt().strftime('%d/%m/%Y'),
+                        "Date de retour prevue": emprunt.getDateRetourPrevue().strftime('%d/%m/%Y'),
+                        "Date de retour effective": emprunt.getDateRetourEffective().strftime('%d/%m/%Y') if emprunt.getDateRetourEffective() else ""
+                    })
+        except Exception as e:
+            print(f"Erreur lors de la sauvegarde des emprunts: {e}")
+    def save_adherents_csv(self):
+        try:
+            with open("Database/CSV/adherents.csv", "w", newline='', encoding='utf-8') as f:
+                fieldnames = ["Code", "Nom", "Prenom", "Date d'adhésion"]
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                for adherent in self.__adherents.values():
+                    writer.writerow({
+                        "Code": adherent.getCode(),
+                        "Nom": adherent.get_nom(),
+                        "Prenom": adherent.get_prenomm(),
+                        "Date d'adhésion": adherent.getDateDateAdhésion().strftime('%d/%m/%Y')
+                    })
+        except Exception as e:
+            print(f"Erreur lors de la sauvegarde des adherents: {e}")

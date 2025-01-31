@@ -81,7 +81,6 @@ class livre:
             "nbr_exemplaire_disponible": self.__nbr_exemplaire_disponible,
             "nbrEmprunt": self.__nbrEmprunt
         }
-
     @classmethod
     def from_dict(cls, data):
         """Create a livre instance from a dictionary"""

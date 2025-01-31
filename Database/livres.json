@@ -1,14 +1,122 @@
 [
     {
-        "code": "L1234",
-        "titre": "LIVRE",
+        "code": "L5001",
+        "titre": "1984",
         "auteur": {
-            "nom": "ALi",
-            "prenom": "Mohamed",
-            "code": "A1234"
+            "nom": "Orwell",
+            "prenom": "George",
+            "code": "A2001"
         },
-        "nbr_ttl_exemplaire": 19,
+        "nbr_ttl_exemplaire": 25,
+        "nbr_exemplaire_disponible": 20,
+        "nbrEmprunt": 15
+    },
+    {
+        "code": "L5002", 
+        "titre": "Le Petit Prince",
+        "auteur": {
+            "nom": "Saint-Exupery",
+            "prenom": "Antoine",
+            "code": "A2002"
+        },
+        "nbr_ttl_exemplaire": 30,
+        "nbr_exemplaire_disponible": 22,
+        "nbrEmprunt": 18
+    },
+    {
+        "code": "L5003",
+        "titre": "Harry Potter a l'ecole des sorciers",
+        "auteur": {
+            "nom": "Rowling",
+            "prenom": "J.K.",
+            "code": "A2003"
+        },
+        "nbr_ttl_exemplaire": 35,
+        "nbr_exemplaire_disponible": 25,
+        "nbrEmprunt": 25
+    },
+    {
+        "code": "L5004",
+        "titre": "L'Etranger",
+        "auteur": {
+            "nom": "Camus",
+            "prenom": "Albert",
+            "code": "A2004"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 15,
+        "nbrEmprunt": 12
+    },
+    {
+        "code": "L5005",
+        "titre": "Les Miserables",
+        "auteur": {
+            "nom": "Hugo",
+            "prenom": "Victor",
+            "code": "A2005"
+        },
+        "nbr_ttl_exemplaire": 25,
         "nbr_exemplaire_disponible": 18,
-        "nbrEmprunt": 1
+        "nbrEmprunt": 17
+    },
+    {
+        "code": "L5006",
+        "titre": "Don Quichotte",
+        "auteur": {
+            "nom": "Cervantes",
+            "prenom": "Miguel",
+            "code": "A2006"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 16,
+        "nbrEmprunt": 14
+    },
+    {
+        "code": "L5007",
+        "titre": "Le Comte de Monte-Cristo",
+        "auteur": {
+            "nom": "Dumas",
+            "prenom": "Alexandre",
+            "code": "A2007"
+        },
+        "nbr_ttl_exemplaire": 22,
+        "nbr_exemplaire_disponible": 17,
+        "nbrEmprunt": 15
+    },
+    {
+        "code": "L5008",
+        "titre": "Madame Bovary",
+        "auteur": {
+            "nom": "Flaubert",
+            "prenom": "Gustave",
+            "code": "A2008"
+        },
+        "nbr_ttl_exemplaire": 18,
+        "nbr_exemplaire_disponible": 14,
+        "nbrEmprunt": 11
+    },
+    {
+        "code": "L5009",
+        "titre": "Le Rouge et le Noir",
+        "auteur": {
+            "nom": "Stendhal",
+            "prenom": "Henri",
+            "code": "A2009"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 16,
+        "nbrEmprunt": 13
+    },
+    {
+        "code": "L5010",
+        "titre": "Notre-Dame de Paris",
+        "auteur": {
+            "nom": "Hugo",
+            "prenom": "Victor", 
+            "code": "A2005"
+        },
+        "nbr_ttl_exemplaire": 24,
+        "nbr_exemplaire_disponible": 19,
+        "nbrEmprunt": 16
     }
 ]

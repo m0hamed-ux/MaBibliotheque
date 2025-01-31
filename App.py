@@ -7,6 +7,7 @@ from PIL import Image, ImageTk
 from Bilio import Biblio
 import json
 from Adherent import Adherent
+import csv
 
 
 #Variables
@@ -19,9 +20,9 @@ totalBooks = len(gestion.get_livres())
 TotalCopies = gestion.getTotalCopies()
 availableBooks = len(gestion.get_available_books())
 TotalAvailableCopies = gestion.getTotalAvailableCopies()
-borrowedBooks = len(gestion.get_borrowed_books())
+borrowedBooks = TotalCopies - TotalAvailableCopies
 totalClients = len(gestion.get_all_clients())
-        
+top5Books = gestion.TopLivres()
 
 
 def defaultSettings():
@@ -110,14 +111,14 @@ def updateMain(frame):
     else:
         dashboardContent.pack_forget()
 def updateStats():
-    global totalBooks, availableBooks, borrowedBooks, totalClients, TotalCopies, TotalAvailableCopies
+    global totalBooks, availableBooks, borrowedBooks, totalClients, TotalCopies, TotalAvailableCopies, top5Books
     totalBooks = len(gestion.get_livres())
+    TotalCopies = gestion.getTotalCopies()
     availableBooks = len(gestion.get_available_books())
-    borrowedBooks = len(gestion.get_borrowed_books())
+    TotalAvailableCopies = gestion.getTotalAvailableCopies()
+    borrowedBooks = TotalCopies - TotalAvailableCopies
     totalClients = len(gestion.get_all_clients())
-    TotalCopies = sum(livre["nbr_ttl_exemplaire"] for livre in gestion.get_livres())
-    TotalAvailableCopies = sum(livre["nbr_exemplaire_disponible"] for livre in gestion.get_available_books())
-
+    top5Books = gestion.TopLivres()
 
 set_appearance_mode("dark")
 currentFrame="Accueil"
@@ -200,7 +201,7 @@ CTkLabel(totalBooksFrame, text="+20% par rapport au mois précédent", font=("Ar
 
 availableBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(availableBooksFrame, text="Livres disponibles", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
-CTkLabel(availableBooksFrame, text=availableBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
+CTkLabel(availableBooksFrame, text=TotalAvailableCopies, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
 CTkLabel(availableBooksFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
 
@@ -219,6 +220,7 @@ CTkLabel(totalClientsFrame, text="+10% par rapport au mois précédent", font=("
 recentFrame = CTkScrollableFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), label_text="Activité récente", label_font=("Arial", 20, "bold"), label_text_color=("#000", "#fff"), label_fg_color=("#fff", "#1e1e1e"), label_anchor="w")
 recentActivitiesFile = open("Database/recentActivities.txt", "r")
 recentActivities = recentActivitiesFile.readlines()
+recentActivities.reverse()
 class RecentActivity(CTkFrame):
     def __init__(self, parent, text, font, **kwargs):
         super().__init__(parent, **kwargs)
@@ -234,8 +236,27 @@ recentActivitiesFile.close()
 
 
 #Top 5 Books
+class BookListItem(CTkFrame):
+    def __init__(self, parent, name, nbrEmprunt, auteur, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.pack(side=TOP, fill=X, expand=False, padx=5)
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        self.rankCircle = CTkLabel(self, text=f"{i+1}", font=("Arial", 15, "bold"), fg_color=("#1e1e1e", "#fff"), corner_radius=100, width=40, height=40, text_color=("#fff", "#1e1e1e"))
+        self.rankCircle.pack(side=LEFT, padx=10, pady=10)
+        self.bookInfoFrame = CTkFrame(self, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        self.bookInfoFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=0)
+        self.bookTitle = CTkLabel(self.bookInfoFrame, text=f"{name}", font=("Arial Bold", 15), justify="left", anchor="w")
+        self.bookTitle.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
+        self.bookAuthor = CTkLabel(self.bookInfoFrame, text=f"de {auteur}", font=("Arial", 15), justify="left", anchor="w", text_color=("#666666", "#b5b5b5"))
+        self.bookAuthor.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
+        self.NbrEmprunt = CTkLabel(self, text=f"   {nbrEmprunt}   ", font=("Arial", 15), justify="right", anchor="e", compound="left", image=loanIcon, text_color=("#666666", "#b5b5b5"))
+        self.NbrEmprunt.pack(side=RIGHT, fill=X, expand=True, padx=5, pady=0, anchor="e")
+
 top5BooksFrame = CTkFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(top5BooksFrame, text="Top 5 Books", font=("Arial", 20, "bold")).pack(pady=20, padx=20, anchor="w")
+CTkLabel(top5BooksFrame, text="Top 5 Livres", font=("Arial", 20, "bold")).pack(pady=(20,10), padx=20, anchor="w")
+for i in range(5) if len(top5Books) >= 5 else range(len(top5Books)):
+    book = top5Books[i]
+    BookListItem(top5BooksFrame, book.get_titre(), book.getNbrEmprunt(), str(f"{book.get_auteur().get_nom()} {book.get_auteur().get_prenomm()}"))
 
 #Position
 statsFrame.pack(side=TOP, fill=X, pady=(0,10))
@@ -244,7 +265,7 @@ availableBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 borrowedBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 totalClientsFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=5)
-top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
+top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
 #-----------------------------------------------------------------------------
 
 # Your Content here ----------------------------------------------------------------------
@@ -283,9 +304,9 @@ mainContent.pack(side=TOP, fill=BOTH, expand=True, padx=10, pady=10)
 menubar = Menu(app) 
 file = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Fichier', menu=file)
-file.add_command(label='Enregistrer les livres csv', command=None)
-file.add_command(label='Enregistrer les emprunts csv', command=None)
-file.add_command(label='Enregistrer les adherents csv', command=None)
+file.add_command(label='Enregistrer les livres csv', command=lambda: gestion.save_livres_csv() & messagebox.showinfo("Enregistrement", "Les livres ont ete enregistres avec succes"))
+file.add_command(label='Enregistrer les emprunts csv', command=lambda: gestion.save_emprunts_csv() & messagebox.showinfo("Enregistrement", "Les emprunts ont ete enregistres avec succes"))
+file.add_command(label='Enregistrer les adherents csv', command=lambda: gestion.save_adherents_csv() & messagebox.showinfo("Enregistrement", "Les adherents ont ete enregistres avec succes"))
 file.add_separator()
 file.add_command(label='Quitter', command=app.destroy)
 
@@ -324,6 +345,7 @@ menubar.add_cascade(label='Aide', menu=help_)
 help_.add_command(label='Aide', command=None)
 
 app.config(menu=menubar)
+
 update_menu_colors()
 
 
