@@ -16,7 +16,9 @@ from Adherent import Adherent
 gestion = Biblio()
 gestion.load_data()
 totalBooks = len(gestion.get_livres())
+TotalCopies = gestion.getTotalCopies()
 availableBooks = len(gestion.get_available_books())
+TotalAvailableCopies = gestion.getTotalAvailableCopies()
 borrowedBooks = len(gestion.get_borrowed_books())
 totalClients = len(gestion.get_all_clients())
         
@@ -108,11 +110,13 @@ def updateMain(frame):
     else:
         dashboardContent.pack_forget()
 def updateStats():
-    global totalBooks, availableBooks, borrowedBooks, totalClients
+    global totalBooks, availableBooks, borrowedBooks, totalClients, TotalCopies, TotalAvailableCopies
     totalBooks = len(gestion.get_livres())
     availableBooks = len(gestion.get_available_books())
     borrowedBooks = len(gestion.get_borrowed_books())
     totalClients = len(gestion.get_all_clients())
+    TotalCopies = sum(livre["nbr_ttl_exemplaire"] for livre in gestion.get_livres())
+    TotalAvailableCopies = sum(livre["nbr_exemplaire_disponible"] for livre in gestion.get_available_books())
 
 
 set_appearance_mode("dark")
@@ -190,7 +194,7 @@ statsFrame = CTkFrame(dashboardContent, fg_color=mainColor)
 
 totalBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(totalBooksFrame, text="Total de livres", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
-CTkLabel(totalBooksFrame, text=totalBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
+CTkLabel(totalBooksFrame, text=TotalCopies, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
 CTkLabel(totalBooksFrame, text="+20% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a", "#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
 
 

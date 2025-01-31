@@ -186,6 +186,10 @@ class Biblio:
         print(f"Nombres des livres : {len(self.__livres)}\nNombres des adherents : {len(self.__adherents)}")
     def get_livres(self):
         return self.__livres
+    def getTotalCopies(self):
+        return sum(int(livre.get_nbr_ttl_exemplaire()) for livre in self.__livres.values())
+    def getTotalAvailableCopies(self):
+        return sum(int(livre.get_nbr_exemplaire_disponible()) for livre in self.__livres.values())
     def get_available_books(self):
         return [livre for livre in self.__livres.values() if livre.LivreDisponible()]
     def get_borrowed_books(self):
