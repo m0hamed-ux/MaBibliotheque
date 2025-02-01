@@ -7,7 +7,6 @@ from PIL import Image, ImageTk
 from Bilio import Biblio
 import json
 from Adherent import Adherent
-import csv
 
 
 #Variables
@@ -53,7 +52,7 @@ def hideShowSideBar():
         main.pack(side=LEFT, fill=BOTH, expand=YES)
         border.configure(cursor="sb_left_arrow")
 def BtnColor(button):
-    btnList = [dashboard, books, clients, AddBook, AddLoan, settings, Loans]
+    btnList = [dashboard, books, clients, AddBook, AddLoan, settings, Loans, AddClient]
     for btn in btnList:
         if btn.cget("text").strip() == button:
             btn.configure(fg_color=btnActiveColor, hover=False)
@@ -78,9 +77,13 @@ def BtnColor(button):
     elif button == "Ajouter un emprunt":
         TitleMain.configure(text="Ajouter un emprunt")
         currentFrame = "Ajouter un emprunt"
+    elif button == "Ajouter un adherent":
+        TitleMain.configure(text="Ajouter un adherent")
+        currentFrame = "Ajouter un adherent"
     elif button == "Paramètres":
         TitleMain.configure(text="Paramètres")
         currentFrame = "Paramètres"
+
 
 
 
@@ -106,12 +109,36 @@ def update_menu_colors():
                        activebackground=active_bg, activeforeground=active_fg,
                        font=menu_font, borderwidth=0, border=0)
 def updateMain(frame):
+    dashboardContent.pack_forget()
+    livresContent.pack_forget()
+    adherentsContent.pack_forget()
+    empruntsContent.pack_forget()
+    ajouterLivreContent.pack_forget()
+    ajouterEmpruntContent.pack_forget()
+    ajouterAdherentContent.pack_forget()
+    parametresContent.pack_forget()
     if frame == "Accueil":
         dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Livres":
+        livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Adherents":
+        adherentsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Emprunts":
+        empruntsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Ajouter un livre":
+        ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Ajouter un emprunt": 
+        ajouterEmpruntContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Ajouter un adherent":
+        ajouterAdherentContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+    elif frame == "Paramètres":
+        parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
     else:
-        dashboardContent.pack_forget()
+        dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 def updateStats():
     global totalBooks, availableBooks, borrowedBooks, totalClients, TotalCopies, TotalAvailableCopies, top5Books
+
+
     totalBooks = len(gestion.get_livres())
     TotalCopies = gestion.getTotalCopies()
     availableBooks = len(gestion.get_available_books())
@@ -143,7 +170,9 @@ bookIcon = CTkImage(dark_image=Image.open("images/bookLight.png"),light_image=Im
 clientsIcon = CTkImage(dark_image=Image.open("images/clientsLight.png"),light_image=Image.open("images/clients.png"), size=(15, 15))
 loanIcon = CTkImage(dark_image=Image.open("images/loanLight.png"),light_image=Image.open("images/loan.png"), size=(15, 15))
 settingsIcon = CTkImage(dark_image=Image.open("images/settingsLight.png"),light_image=Image.open("images/settings.png"), size=(15, 15))
+AddClientIcon = CTkImage(dark_image=Image.open("images/user-addLight.png"),light_image=Image.open("images/user-add.png"), size=(15, 15))
 expandIcon = CTkImage(dark_image=Image.open("images/sidebarLight.png"),light_image=Image.open("images/sidebar.png"), size=(20, 20))
+
 exitIcon = CTkImage(Image.open("images/exit.png"), size=(15, 15))
 
 
@@ -166,7 +195,9 @@ clients = CTkButton(BtnFrame, text="  Adherents", fg_color=bgColor, bg_color=bgC
 Loans = CTkButton(BtnFrame, text="  Emprunts", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Emprunts") & updateMain("Emprunts"))
 AddBook = CTkButton(BtnFrame, text="  Ajouter un livre", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=plusIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un livre") & updateMain("Ajouter un livre"))
 AddLoan = CTkButton(BtnFrame, text="  Ajouter un emprunt", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un emprunt") & updateMain("Ajouter un emprunt"))
+AddClient = CTkButton(BtnFrame, text="  Ajouter un adherent", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=AddClientIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un adherent") & updateMain("Ajouter un adherent"))
 settings = CTkButton(BtnFrame, text="  Paramètres", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=settingsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Paramètres") & updateMain("Paramètres"))
+
 Exit = CTkButton(BtnFrame, text="  Quitter", fg_color=bgColor, bg_color=bgColor, border_width=1, border_color="red", text_color=("red", "red"), font=("Arial", 15), cursor="hand2", image=exitIcon, compound="left", anchor="w", height=33, hover=False, command=lambda: app.destroy())
 
 
@@ -226,11 +257,11 @@ class RecentActivity(CTkFrame):
         super().__init__(parent, **kwargs)
         self.pack(side=TOP, fill=BOTH, expand=True, padx=5)
         self.activity = CTkLabel(self, text=text, font=font)
-        self.activity.pack(side=LEFT, pady=2, padx=20, anchor="w", expand=False)
+        self.activity.pack(side=LEFT, pady=5, padx=10, anchor="w", expand=False)
         self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
 for activity in recentActivities:
     if activity != "\n":
-        RecentActivity(recentFrame, text=f"{activity}", font=("Arial", 15))
+        RecentActivity(recentFrame, text=f"{activity.strip("\n")}", font=("Arial", 15))
 recentActivitiesFile.close()
 
 
@@ -268,7 +299,48 @@ recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=5)
 top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
 #-----------------------------------------------------------------------------
 
-# Your Content here ----------------------------------------------------------------------
+# -------Livres-------------------------------------------------------------------
+livresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+# -------Adherents-------------------------------------------------------------------
+adherentsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+adherentsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+# -------Emprunts-------------------------------------------------------------------
+empruntsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+empruntsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+#-------Ajouter un livre-------------------------------------------------------------------
+ajouterLivreContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+#-------Ajouter un emprunt-------------------------------------------------------------------
+ajouterEmpruntContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+ajouterEmpruntContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+#-------Ajouter un adherent-------------------------------------------------------------------
+ajouterAdherentContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+ajouterAdherentContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+#-------Paramètres-------------------------------------------------------------------
+parametresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #Position----------------------------------------------------------------------
 sideMenu.pack(side=LEFT, fill=Y)
@@ -282,9 +354,11 @@ clients.pack(side=TOP, fill=X, padx=5, pady=5)
 Loans.pack(side=TOP, fill=X, padx=5, pady=5)
 AddBook.pack(side=TOP, fill=X, padx=5, pady=5)
 AddLoan.pack(side=TOP, fill=X, padx=5, pady=5)
+AddClient.pack(side=TOP, fill=X, padx=5, pady=5)
 settings.pack(side=TOP, fill=X, padx=5, pady=5)
 Exit.pack(side=BOTTOM, fill=X, padx=5, pady=5)
 border.pack(side=LEFT, fill=Y)
+
 
 
 main.pack(side=LEFT, fill=BOTH, expand=YES)
