@@ -6,7 +6,12 @@ from customtkinter import *
 from PIL import Image, ImageTk
 from Bilio import Biblio
 import json
+import json as js
 from Adherent import Adherent
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import random
+
 
 
 #Variables
@@ -25,20 +30,31 @@ top5Books = gestion.TopLivres()
 
 
 def defaultSettings():
-    with open("Database/settings.json", "r") as file:
-        data_dict = json.load(file)
-    if data_dict["theme"] == "light":
-        set_appearance_mode("light")
-    else:
-        set_appearance_mode("dark")
-    set_widget_scaling(data_dict["zoom"])
+    try:
+        with open("Database/settings.json", "r") as file:
+            data_dict = js.load(file)
+        theme = data_dict["theme"]
+        set_appearance_mode(theme)
+        histogram.set_theme(theme)
+        update_chart()
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        set_appearance_mode("light") 
+        histogram.set_theme("light")
+        update_chart()
+        
 def change_theme():
     if get_appearance_mode() == "Dark":
         set_appearance_mode("light")
         Modevr.set("Light mode")
+        histogram.set_theme("light")
+        update_chart()
+
     else:
         set_appearance_mode("dark")
         Modevr.set("Dark mode")
+        histogram.set_theme("dark")
+        update_chart()
+        
     update_menu_colors()
 def hideShowSideBar():
     if sideMenu.winfo_ismapped():
@@ -172,7 +188,7 @@ loanIcon = CTkImage(dark_image=Image.open("images/loanLight.png"),light_image=Im
 settingsIcon = CTkImage(dark_image=Image.open("images/settingsLight.png"),light_image=Image.open("images/settings.png"), size=(15, 15))
 AddClientIcon = CTkImage(dark_image=Image.open("images/user-addLight.png"),light_image=Image.open("images/user-add.png"), size=(15, 15))
 expandIcon = CTkImage(dark_image=Image.open("images/sidebarLight.png"),light_image=Image.open("images/sidebar.png"), size=(20, 20))
-
+stockIcon = CTkImage(Image.open("images/stock.png"), size=(15, 15))
 exitIcon = CTkImage(Image.open("images/exit.png"), size=(15, 15))
 
 
@@ -217,7 +233,7 @@ vBorder = CTkFrame(MainFrame, width=800, height=2, bg_color=("#e2e8f0", "#27272a
 mainContent = CTkFrame(main, border_width=0, fg_color=mainColor)
 
 #--------Dashboard------------------------------------------------------------------
-dashboardContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+dashboardContent = CTkScrollableFrame(mainContent, border_width=0, fg_color=mainColor)
 dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
 
@@ -270,7 +286,7 @@ recentActivitiesFile.close()
 class BookListItem(CTkFrame):
     def __init__(self, parent, name, nbrEmprunt, auteur, **kwargs):
         super().__init__(parent, **kwargs)
-        self.pack(side=TOP, fill=X, expand=False, padx=5)
+        self.pack(side=TOP, fill=X, expand=False, padx=5, pady=1)
         self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
         self.rankCircle = CTkLabel(self, text=f"{i+1}", font=("Arial", 15, "bold"), fg_color=("#1e1e1e", "#fff"), corner_radius=100, width=40, height=40, text_color=("#fff", "#1e1e1e"))
         self.rankCircle.pack(side=LEFT, padx=10, pady=10)
@@ -282,6 +298,25 @@ class BookListItem(CTkFrame):
         self.bookAuthor.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
         self.NbrEmprunt = CTkLabel(self, text=f"   {nbrEmprunt}   ", font=("Arial", 15), justify="right", anchor="e", compound="left", image=loanIcon, text_color=("#666666", "#b5b5b5"))
         self.NbrEmprunt.pack(side=RIGHT, fill=X, expand=True, padx=5, pady=0, anchor="e")
+class BookListItem2(CTkFrame):
+    def __init__(self, parent, name, nbrDisponible, auteur, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.pack(side=TOP, fill=X, expand=False, padx=5, pady=2)
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        self.bookInfoFrame = CTkFrame(self, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        self.bookInfoFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=0)
+        self.bookTitle = CTkLabel(self.bookInfoFrame, text=f"{name}", font=("Arial Bold", 15), justify="left", anchor="w")
+        self.bookTitle.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
+        self.bookAuthor = CTkLabel(self.bookInfoFrame, text=f"de {auteur}", font=("Arial", 15), justify="left", anchor="w", text_color=("#666666", "#b5b5b5"))
+        self.bookAuthor.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
+        self.NbrDisponible = CTkLabel(self, text=f"   {nbrDisponible}   ", font=("Arial", 15), justify="right", anchor="e", compound="left", image=stockIcon, text_color="red")
+        self.NbrDisponible.pack(side=RIGHT, fill=X, expand=True, padx=5, pady=0, anchor="e")
+
+        
+
+
+
+
 
 top5BooksFrame = CTkFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 CTkLabel(top5BooksFrame, text="Top 5 Livres", font=("Arial", 20, "bold")).pack(pady=(20,10), padx=20, anchor="w")
@@ -289,17 +324,81 @@ for i in range(5) if len(top5Books) >= 5 else range(len(top5Books)):
     book = top5Books[i]
     BookListItem(top5BooksFrame, book.get_titre(), book.getNbrEmprunt(), str(f"{book.get_auteur().get_nom()} {book.get_auteur().get_prenomm()}"))
 
+
+bottomFrame = CTkFrame(dashboardContent, fg_color=mainColor, border_width=0, corner_radius=0, bg_color=mainColor)
+bottomFrame.pack(side=BOTTOM, fill=BOTH, expand=False, padx=(0,5))
+
+outOfStockFrame = CTkFrame(bottomFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+
+CTkLabel(outOfStockFrame, text="Livres non disponibles ou presque", font=("Arial", 20, "bold")).pack(pady=(20,10), padx=20, anchor="w")
+outOfStockBooks = gestion.get_livres_non_disponibles()
+for book in outOfStockBooks:
+    BookListItem2(outOfStockFrame, book.get_titre(), book.get_nbr_exemplaire_disponible(), str(f"{book.get_auteur().get_nom()} {book.get_auteur().get_prenomm()}"))
+
+#Chart
+chartFrame = CTkFrame(bottomFrame   , fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+CTitleFrame = CTkFrame(chartFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+CTkLabel(CTitleFrame, text="Les emprunts", font=("Arial", 20, "bold")).pack(side=LEFT, pady=0, padx=0, anchor="w")
+
+chart = CTkFrame(chartFrame, fg_color=("#fff", "#1e1e1e"), bg_color=("#fff", "#1e1e1e"), border_width=0)
+chart.pack(side=BOTTOM, fill=BOTH, expand=True, padx=10, pady=10)
+
+controlFrame = CTkFrame(CTitleFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0)
+controlFrame.pack(side=RIGHT, fill=Y, padx=0, pady=0)
+
+CTkLabel(controlFrame, text="Periode : ", font=("Arial", 15, "bold")).pack(side=LEFT, padx=5, pady=5)
+rangeSelector = CTkComboBox(controlFrame, values=["7", "14", "30"], width=80, command=lambda x: change_range(x))
+rangeSelector.set("30") 
+rangeSelector.pack(side=RIGHT, padx=5, pady=5)
+
+def change_range(days):
+    try:
+        histogram.days = int(days)
+        update_chart()
+    except ValueError:
+        pass
+
+
+from histo import LoanHistogram
+histogram = LoanHistogram(data_file="Database/Emprunts.txt", theme="light" if get_appearance_mode() == "light" else "dark", days=30)
+histogram.embed_in_tkinter(chart)
+def update_chart():
+    for widget in chart.winfo_children():
+        widget.destroy()
+    histogram.embed_in_tkinter(chart)
+
+
+
+
+
+
+
+
+
+
+
+
 #Position
 statsFrame.pack(side=TOP, fill=X, pady=(0,10))
 totalBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
+bottomFrame.pack(side=BOTTOM, fill=BOTH, expand=TRUE, pady=10)
 availableBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 borrowedBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 totalClientsFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=5)
+recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
+outOfStockFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
+chartFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
+CTitleFrame.pack(side=TOP, fill=X, pady=(20,10), padx=20)
+
+
+
 #-----------------------------------------------------------------------------
 
+
+
 # -------Livres-------------------------------------------------------------------
+
 livresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
@@ -432,6 +531,7 @@ app.config(menu = menubar)
 
 BtnColor("Accueil")
 updateMain("Accueil")
+defaultSettings()
 
 def mainloop():
     app.mainloop()

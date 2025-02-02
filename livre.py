@@ -70,6 +70,7 @@ class livre:
     def LivreDisponible(self):
         return self.get_nbr_exemplaire_disponible() > 0
     def __str__(self):
+
         return f"---------Livre {self.__code}--------- \n├── Titre : {self.__titre}.\n├── Auteur : {self.__auteur}.\n├── Le nombre total des exemplaires : {self.__nbr_ttl_exemplaire}.\n├── Le nombre des exemplaires disponibles : {self.__nbr_exemplaire_disponible}\n├── Nombre des emprunts : {self.getNbrEmprunt()}"
     def to_dict(self):
         """Convert the book object to a dictionary for JSON serialization"""

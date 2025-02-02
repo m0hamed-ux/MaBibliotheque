@@ -134,7 +134,19 @@ class Biblio:
             f = open("Database/recentActivities.txt", "a")
             f.write(f"L'adherent {adherent.getCode()} a emprunte le livre {livre.get_code()} le {dateEmprunt.strftime('%d/%m/%Y')}\n")
             f.close()
+            # update emprunts.txt
+            f = open("Database/Emprunts.txt", "a")
+            if dateEmprunt.strftime('%d-%m-%Y') in f.read():
+                nbr = f.read().split(":")
+                nbr = int(nbr[1]) + 1
+                f.write(f"{dateEmprunt.strftime('%d-%m-%Y')}:{nbr}\n")
+            else:
+                f.write(f"{dateEmprunt.strftime('%d-%m-%Y')}:1\n")
+            f.close()
+
         self.save_data()
+
+
 
     def retourEmprunt(self,codeEmprunt):
         emprunt = self.__emprunts.get(int(codeEmprunt))
@@ -249,3 +261,5 @@ class Biblio:
                     })
         except Exception as e:
             print(f"Erreur lors de la sauvegarde des adherents: {e}")
+    def get_livres_non_disponibles(self):
+        return [livre for livre in self.__livres.values() if not livre.LivreDisponible() or livre.get_nbr_exemplaire_disponible() <= 3]

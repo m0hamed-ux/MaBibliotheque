@@ -118,5 +118,42 @@
         "nbr_ttl_exemplaire": 24,
         "nbr_exemplaire_disponible": 19,
         "nbrEmprunt": 16
+    },
+    {
+        "code": "L5011",
+        "titre": "La Peste",
+        "auteur": {
+            "nom": "Camus",
+            "prenom": "Albert",
+            "code": "A2004"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 1,
+        "nbrEmprunt": 19
+    },
+    {
+        "code": "L5012",
+        "titre": "Le Seigneur des Anneaux",
+        "auteur": {
+            "nom": "Tolkien",
+            "prenom": "J.R.R.",
+            "code": "A2003"
+        },
+        "nbr_ttl_exemplaire": 25,
+        "nbr_exemplaire_disponible": 0,
+        "nbrEmprunt": 25
+
+    },
+    {
+        "code": "L5013",
+        "titre": "La Guerre des mondes",
+        "auteur": {
+            "nom": "H.G. Wells",
+            "prenom": "H.G.",
+            "code": "A2003"
+        },
+        "nbr_ttl_exemplaire": 25,
+        "nbr_exemplaire_disponible": 3,
+        "nbrEmprunt": 22
     }
 ]
