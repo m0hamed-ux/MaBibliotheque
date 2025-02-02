@@ -134,16 +134,30 @@ class Biblio:
             f = open("Database/recentActivities.txt", "a")
             f.write(f"L'adherent {adherent.getCode()} a emprunte le livre {livre.get_code()} le {dateEmprunt.strftime('%d/%m/%Y')}\n")
             f.close()
-            # update emprunts.txt
-            f = open("Database/Emprunts.txt", "a")
-            if dateEmprunt.strftime('%d-%m-%Y') in f.read():
-                nbr = f.read().split(":")
-                nbr = int(nbr[1]) + 1
-                f.write(f"{dateEmprunt.strftime('%d-%m-%Y')}:{nbr}\n")
-            else:
-                f.write(f"{dateEmprunt.strftime('%d-%m-%Y')}:1\n")
-            f.close()
+            # Update emprunts.txt 
+            try:
+                with open("Database/emprunts.txt", "r") as f:
+                    lines = f.readlines()
+            except FileNotFoundError:
+                lines = []
+                
+            today = date.today().strftime('%d-%m-%Y')
+            found = False
+            
 
+            for i, line in enumerate(lines):
+                if line.strip():
+                    emprunt_date, count = line.strip().split(":")
+                    if emprunt_date == today:
+                        lines[i] = f"{today}:{int(count) + 1}\n"
+                        found = True
+                        break
+
+            if not found:
+                lines.append(f"{today}:1\n")
+                
+            with open("Database/emprunts.txt", "w") as f:
+                f.writelines(lines)
         self.save_data()
 
 
