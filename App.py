@@ -4,17 +4,15 @@ from tkcalendar import *
 from tkinter import ttk
 from customtkinter import *
 from PIL import Image, ImageTk
-from Bilio import Biblio
+from Bilio import *
 import json
 import json as js
 from Adherent import Adherent
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import random
+from chart import *
 
 
-
-#Variables
 
 
 #Gestion
@@ -35,25 +33,26 @@ def defaultSettings():
             data_dict = js.load(file)
         theme = data_dict["theme"]
         set_appearance_mode(theme)
-        histogram.set_theme(theme)
-        update_chart()
+        changeTheme(chart, theme,  7, "Database/Emprunts.txt")
     except (FileNotFoundError, json.JSONDecodeError, KeyError):
         set_appearance_mode("light") 
-        histogram.set_theme("light")
-        update_chart()
+        changeTheme(chart, "light", 7, "Database/Emprunts.txt")
         
+        
+
+
 def change_theme():
     if get_appearance_mode() == "Dark":
         set_appearance_mode("light")
         Modevr.set("Light mode")
-        histogram.set_theme("light")
-        update_chart()
-
+        changeTheme(chart, "light", 7, "Database/Emprunts.txt")
     else:
         set_appearance_mode("dark")
+
+
         Modevr.set("Dark mode")
-        histogram.set_theme("dark")
-        update_chart()
+        changeTheme(chart, "dark", 7, "Database/Emprunts.txt")
+        
         
     update_menu_colors()
 def hideShowSideBar():
@@ -348,24 +347,21 @@ controlFrame.pack(side=RIGHT, fill=Y, padx=0, pady=0)
 
 CTkLabel(controlFrame, text="Periode : ", font=("Arial", 15, "bold")).pack(side=LEFT, padx=5, pady=5)
 rangeSelector = CTkComboBox(controlFrame, values=["7", "14", "30"], width=80, command=lambda x: change_range(x))
-rangeSelector.set("30") 
+rangeSelector.set("7") 
 rangeSelector.pack(side=RIGHT, padx=5, pady=5)
 
 def change_range(days):
     try:
-        histogram.days = int(days)
-        update_chart()
+        changeDayrange(chart, days, get_appearance_mode().lower(), "Database/Emprunts.txt")
     except ValueError:
         pass
 
 
-from histo import LoanHistogram
-histogram = LoanHistogram(data_file="Database/Emprunts.txt", theme="light" if get_appearance_mode() == "light" else "dark", days=30)
+
+
+histogram = LoanChart(7, get_appearance_mode().lower(), "Database/Emprunts.txt")
 histogram.embed_in_tkinter(chart)
-def update_chart():
-    for widget in chart.winfo_children():
-        widget.destroy()
-    histogram.embed_in_tkinter(chart)
+
 
 
 
@@ -388,8 +384,9 @@ totalClientsFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
 outOfStockFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
-chartFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
+chartFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
 CTitleFrame.pack(side=TOP, fill=X, pady=(20,10), padx=20)
+
 
 
 
@@ -426,6 +423,70 @@ ajouterAdherentContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 parametresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
+parametresTitle = CTkLabel(parametresContent, text="Paramètres", font=("Hubot Sans", 24, "bold"), text_color=("#03045E", "#FFFFFF"))
+parametresTitle.pack(side=TOP, pady=(10, 20), padx=20, anchor="w")
+
+themeFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
+themeFrame.pack(side=TOP, fill=X, padx=20, pady=10)
+
+themeLabel = CTkLabel(themeFrame, text="Thème", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
+themeLabel.pack(side=TOP, anchor="w", pady=(0, 10))
+
+themeVar = StringVar(value="Dark" if get_appearance_mode() == "Dark" else "Light")
+
+def update_theme():
+    theme = themeVar.get()
+    set_appearance_mode(theme.lower())
+    update_menu_colors()
+
+CTkRadioButton(themeFrame, text="Mode Sombre", variable=themeVar, value="Dark", font=("Roboto", 14), command=update_theme).pack(side=TOP, anchor="w", pady=5)
+CTkRadioButton(themeFrame, text="Mode Clair", variable=themeVar, value="Light", font=("Roboto", 14), command=update_theme).pack(side=TOP, anchor="w", pady=5)
+
+languageFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
+languageFrame.pack(side=TOP, fill=X, padx=20, pady=10)
+
+languageLabel = CTkLabel(languageFrame, text="Langue", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
+languageLabel.pack(side=TOP, anchor="w", pady=(0, 10))
+
+languageVar = StringVar(value="Français")
+
+def update_language():
+    language = languageVar.get()
+    messagebox.showinfo("Langue", f"Langue sélectionnée : {language}")
+
+CTkRadioButton(languageFrame, text="Français", variable=languageVar, value="Français", font=("Roboto", 14), command=update_language).pack(side=TOP, anchor="w", pady=5)
+CTkRadioButton(languageFrame, text="English", variable=languageVar, value="English", font=("Roboto", 14), command=update_language).pack(side=TOP, anchor="w", pady=5)
+
+accountFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
+accountFrame.pack(side=TOP, fill=X, padx=20, pady=10)
+
+accountLabel = CTkLabel(accountFrame, text="Paramètres du Compte", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
+accountLabel.pack(side=TOP, anchor="w", pady=(0, 10))
+
+usernameLabel = CTkLabel(accountFrame, text="Nom d'utilisateur", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
+usernameLabel.pack(side=TOP, anchor="w", pady=(0, 5))
+
+usernameEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre nom d'utilisateur", width=300)
+usernameEntry.pack(side=TOP, anchor="w", pady=(0, 10))
+
+passwordLabel = CTkLabel(accountFrame, text="Mot de passe", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
+passwordLabel.pack(side=TOP, anchor="w", pady=(0, 5))
+
+passwordEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre mot de passe", show="*", width=300)
+passwordEntry.pack(side=TOP, anchor="w", pady=(0, 10))
+
+def save_account_settings():
+    username = usernameEntry.get()
+    password = passwordEntry.get()
+    if username and password:
+        messagebox.showinfo("Succès", "Paramètres du compte mis à jour avec succès!")
+    else:
+        messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+
+saveButton = CTkButton(accountFrame, text="Enregistrer", font=("Roboto", 14), fg_color="#00B4D8", hover_color="#90E0FF", command=save_account_settings)
+saveButton.pack(side=TOP, anchor="w", pady=(10, 0))
+
+parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
 
 

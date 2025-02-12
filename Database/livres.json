@@ -1,14 +1,122 @@
 [
     {
         "code": "L1234",
-        "titre": "the art of not giving a fuck",
+        "titre": "The Subtle Art of Not Giving a F*ck",
         "auteur": {
-            "nom": "Albert",
-            "prenom": "Nilson",
+            "nom": "Manson",
+            "prenom": "Mark",
             "code": "A1234"
         },
         "nbr_ttl_exemplaire": 15,
-        "nbr_exemplaire_disponible": 9,
+        "nbr_exemplaire_disponible": 3,
         "nbrEmprunt": 7
+    },
+    {
+        "code": "L1235", 
+        "titre": "1984",
+        "auteur": {
+            "nom": "Orwell",
+            "prenom": "George",
+            "code": "A1235"
+        },
+        "nbr_ttl_exemplaire": 12,
+        "nbr_exemplaire_disponible": 5,
+        "nbrEmprunt": 4
+    },
+    {
+        "code": "L1236",
+        "titre": "To Kill a Mockingbird",
+        "auteur": {
+            "nom": "Lee",
+            "prenom": "Harper",
+            "code": "A1236"
+        },
+        "nbr_ttl_exemplaire": 10,
+        "nbr_exemplaire_disponible": 2,
+        "nbrEmprunt": 6
+    },
+    {
+        "code": "L1237",
+        "titre": "The Great Gatsby",
+        "auteur": {
+            "nom": "Fitzgerald",
+            "prenom": "F. Scott",
+            "code": "A1237"
+        },
+        "nbr_ttl_exemplaire": 8,
+        "nbr_exemplaire_disponible": 4,
+        "nbrEmprunt": 3
+    },
+    {
+        "code": "L1238",
+        "titre": "Pride and Prejudice",
+        "auteur": {
+            "nom": "Austen",
+            "prenom": "Jane",
+            "code": "A1238"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 8,
+        "nbrEmprunt": 9
+    },
+    {
+        "code": "L1239",
+        "titre": "The Catcher in the Rye",
+        "auteur": {
+            "nom": "Salinger",
+            "prenom": "J.D.",
+            "code": "A1239"
+        },
+        "nbr_ttl_exemplaire": 14,
+        "nbr_exemplaire_disponible": 6,
+        "nbrEmprunt": 5
+    },
+    {
+        "code": "L1240",
+        "titre": "One Hundred Years of Solitude",
+        "auteur": {
+            "nom": "García Márquez",
+            "prenom": "Gabriel",
+            "code": "A1240"
+        },
+        "nbr_ttl_exemplaire": 16,
+        "nbr_exemplaire_disponible": 7,
+        "nbrEmprunt": 8
+    },
+    {
+        "code": "L1241",
+        "titre": "The Hobbit",
+        "auteur": {
+            "nom": "Tolkien",
+            "prenom": "J.R.R.",
+            "code": "A1241"
+        },
+        "nbr_ttl_exemplaire": 25,
+        "nbr_exemplaire_disponible": 10,
+        "nbrEmprunt": 12
+    },
+    {
+        "code": "L1242",
+        "titre": "Brave New World",
+        "auteur": {
+            "nom": "Huxley",
+            "prenom": "Aldous",
+            "code": "A1242"
+        },
+        "nbr_ttl_exemplaire": 18,
+        "nbr_exemplaire_disponible": 9,
+        "nbrEmprunt": 6
+    },
+    {
+        "code": "L1243",
+        "titre": "The Little Prince",
+        "auteur": {
+            "nom": "de Saint-Exupéry",
+            "prenom": "Antoine",
+            "code": "A1243"
+        },
+        "nbr_ttl_exemplaire": 22,
+        "nbr_exemplaire_disponible": 11,
+        "nbrEmprunt": 8
     }
 ]
