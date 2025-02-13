@@ -4,6 +4,7 @@ import re
 import json as js
 
 
+
 def validate_login():
     username = username_entry.get()
     password = password_entry.get()

@@ -21,150 +21,54 @@
         },
         "dateEmprunt": "2025-02-02",
         "dateRetourPrevue": "2025-02-05",
-        "dateRetourEffective": null
+        "dateRetourEffective": "2025-02-05"
     },
     {
         "code": 2,
         "livreEmprunte": {
-            "code": "L1234",
-            "titre": "the art of not giving a fuck",
+            "code": "L5678",
+            "titre": "To Kill a Mockingbird",
             "auteur": {
-                "nom": "Albert",
-                "prenom": "Nilson",
-                "code": "A1234"
+                "nom": "Lee",
+                "prenom": "Harper",
+                "code": "A5678"
             },
-            "nbr_ttl_exemplaire": 5,
-            "nbr_exemplaire_disponible": 3,
+            "nbr_ttl_exemplaire": 4,
+            "nbr_exemplaire_disponible": 2,
             "nbrEmprunt": 2
         },
         "EmprunteurLivre": {
-            "nom": "ali",
+            "nom": "Allali",
             "prenom": "Ahmed",
-            "dateAdhesion": "2020-01-01",
-            "code": 1
+            "dateAdhesion": "2021-03-15",
+            "code": 2
         },
-        "dateEmprunt": "2025-02-02",
-        "dateRetourPrevue": "2025-02-05",
+        "dateEmprunt": "2025-03-01",
+        "dateRetourPrevue": "2025-01-10",
         "dateRetourEffective": null
     },
     {
         "code": 3,
         "livreEmprunte": {
-            "code": "L1234",
-            "titre": "the art of not giving a fuck",
+            "code": "L9101",
+            "titre": "1984",
             "auteur": {
-                "nom": "Albert",
-                "prenom": "Nilson",
-                "code": "A1234"
+                "nom": "Orwell",
+                "prenom": "George",
+                "code": "A9101"
             },
-            "nbr_ttl_exemplaire": 5,
-            "nbr_exemplaire_disponible": 1,
-            "nbrEmprunt": 4
+            "nbr_ttl_exemplaire": 6,
+            "nbr_exemplaire_disponible": 4,
+            "nbrEmprunt": 2
         },
         "EmprunteurLivre": {
-            "nom": "ali",
-            "prenom": "Ahmed",
-            "dateAdhesion": "2020-01-01",
-            "code": 1
+            "nom": "Kadiri",
+            "prenom": "Ali",
+            "dateAdhesion": "2019-07-22",
+            "code": 3
         },
-        "dateEmprunt": "2025-02-02",
-        "dateRetourPrevue": "2025-02-05",
-        "dateRetourEffective": null
-    },
-    {
-        "code": 4,
-        "livreEmprunte": {
-            "code": "L1234",
-            "titre": "the art of not giving a fuck",
-            "auteur": {
-                "nom": "Albert",
-                "prenom": "Nilson",
-                "code": "A1234"
-            },
-            "nbr_ttl_exemplaire": 5,
-            "nbr_exemplaire_disponible": 1,
-            "nbrEmprunt": 4
-        },
-        "EmprunteurLivre": {
-            "nom": "ali",
-            "prenom": "Ahmed",
-            "dateAdhesion": "2020-01-01",
-            "code": 1
-        },
-        "dateEmprunt": "2025-02-02",
-        "dateRetourPrevue": "2025-02-05",
-        "dateRetourEffective": null
-    },
-    {
-        "code": 5,
-        "livreEmprunte": {
-            "code": "L1234",
-            "titre": "the art of not giving a fuck",
-            "auteur": {
-                "nom": "Albert",
-                "prenom": "Nilson",
-                "code": "A1234"
-            },
-            "nbr_ttl_exemplaire": 15,
-            "nbr_exemplaire_disponible": 9,
-            "nbrEmprunt": 7
-        },
-        "EmprunteurLivre": {
-            "nom": "ali",
-            "prenom": "Ahmed",
-            "dateAdhesion": "2020-01-01",
-            "code": 1
-        },
-        "dateEmprunt": "2025-02-02",
-        "dateRetourPrevue": "2025-02-05",
-        "dateRetourEffective": null
-    },
-    {
-        "code": 6,
-        "livreEmprunte": {
-            "code": "L1234",
-            "titre": "the art of not giving a fuck",
-            "auteur": {
-                "nom": "Albert",
-                "prenom": "Nilson",
-                "code": "A1234"
-            },
-            "nbr_ttl_exemplaire": 15,
-            "nbr_exemplaire_disponible": 9,
-            "nbrEmprunt": 7
-        },
-        "EmprunteurLivre": {
-            "nom": "ali",
-            "prenom": "Ahmed",
-            "dateAdhesion": "2020-01-01",
-            "code": 1
-        },
-        "dateEmprunt": "2025-02-02",
-        "dateRetourPrevue": "2025-02-05",
-        "dateRetourEffective": null
-    },
-    {
-        "code": 7,
-        "livreEmprunte": {
-            "code": "L1234",
-            "titre": "the art of not giving a fuck",
-            "auteur": {
-                "nom": "Albert",
-                "prenom": "Nilson",
-                "code": "A1234"
-            },
-            "nbr_ttl_exemplaire": 15,
-            "nbr_exemplaire_disponible": 9,
-            "nbrEmprunt": 7
-        },
-        "EmprunteurLivre": {
-            "nom": "ali",
-            "prenom": "Ahmed",
-            "dateAdhesion": "2020-01-01",
-            "code": 1
-        },
-        "dateEmprunt": "2025-02-02",
-        "dateRetourPrevue": "2025-02-05",
+        "dateEmprunt": "2025-04-10",
+        "dateRetourPrevue": "2025-04-20",
         "dateRetourEffective": null
     }
 ]

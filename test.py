@@ -19,7 +19,6 @@ from chart import *
 gestion = Biblio()
 gestion.load_data()
 totalBooks = len(gestion.get_livres())
-Emprnts = gestion.get_all_emprunts()
 TotalCopies = gestion.getTotalCopies()
 availableBooks = len(gestion.get_available_books())
 TotalAvailableCopies = gestion.getTotalAvailableCopies()
@@ -182,7 +181,6 @@ logoImage = CTkImage(PIL.Image.open("images/logo.png"), size=(30, 30))
 ThemeIcon = CTkImage(dark_image=PIL.Image.open("images/moon.png"),light_image=PIL.Image.open("images/sun.png") ,size=(20, 20))
 dashboardIcon = CTkImage(dark_image=PIL.Image.open("images/homeLight.png"),light_image=PIL.Image.open("images/home.png"), size=(15, 15))
 plusIcon = CTkImage(dark_image=PIL.Image.open("images/plusLight.png"),light_image=PIL.Image.open("images/plus.png"), size=(15, 15))
-plusIconLight = CTkImage(PIL.Image.open("images/plusLight.png"), size=(15, 15))
 bookIcon = CTkImage(dark_image=PIL.Image.open("images/bookLight.png"),light_image=PIL.Image.open("images/book.png"), size=(15, 15))
 clientsIcon = CTkImage(dark_image=PIL.Image.open("images/clientsLight.png"),light_image=PIL.Image.open("images/clients.png"), size=(15, 15))
 loanIcon = CTkImage(dark_image=PIL.Image.open("images/loanLight.png"),light_image=PIL.Image.open("images/loan.png"), size=(15, 15))
@@ -191,7 +189,6 @@ AddClientIcon = CTkImage(dark_image=PIL.Image.open("images/user-addLight.png"),l
 expandIcon = CTkImage(dark_image=PIL.Image.open("images/sidebarLight.png"),light_image=PIL.Image.open("images/sidebar.png"), size=(20, 20))
 stockIcon = CTkImage(PIL.Image.open("images/stock.png"), size=(15, 15))
 exitIcon = CTkImage(PIL.Image.open("images/exit.png"), size=(15, 15))
-penIcon = CTkImage(PIL.Image.open("images/pen.png"), size=(20, 20))
 
 
 
@@ -376,6 +373,7 @@ histogram.embed_in_tkinter(chart)
 
 
 
+
 #Position
 statsFrame.pack(side=TOP, fill=X, pady=(0,10))
 totalBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
@@ -408,88 +406,87 @@ adherentsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 # -------Emprunts-------------------------------------------------------------------
 empruntsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 empruntsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-searchFrame = CTkFrame(empruntsContent, fg_color='transparent', corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-searchInput = CTkEntry(searchFrame, placeholder_text='Rechercher par livre, code Emprunt, Adherent', fg_color=("#fff", "#1e1e1e"), corner_radius=7, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), height=35)
-filterCombo = CTkComboBox(searchFrame, values=['tous', 'rendu','en cours', 'non rendu'], corner_radius=7, height=35, fg_color=("#e2e8f0", "#27272a"), button_color=("#e2e8f0", "#27272a"), button_hover_color="#515153", border_color=("#e2e8f0", "#27272a"), command=lambda e: Emp.filter(e))
-AddEmp = CTkButton(searchFrame, text='Ajouter', fg_color=('#000', '#1e1e1e'), corner_radius=7, border_width=0, border_color=("#e2e8f0", "#1e1e1e"), height=35, text_color="#fff",hover_color=('#515153','#515153'), compound='left', anchor='center', image=plusIconLight, cursor='hand2', command=lambda: BtnColor("Ajouter un livre") & updateMain("Ajouter un livre"))
-EmpruntsFrame = CTkScrollableFrame(empruntsContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+searchFrame = CTkFrame(empruntsContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+searchInput = CTkEntry(searchFrame, placeholder_text='', fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 
-class EmpruntItem(CTkFrame):
+
+class LoanItem(CTkFrame):
+    def __init__(self, parent, loan_data, return_callback, extend_callback, delete_callback, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.loan_data = loan_data
+
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1,
+                       border_color=("#e2e8f0", "#1e1e1e"))
+
+        book_info = f"{loan_data['livreEmprunte']['titre']} - {loan_data['livreEmprunte']['auteur']['nom']} {loan_data['livreEmprunte']['auteur']['prenom']}"
+        borrower_info = f"{loan_data['EmprunteurLivre']['nom']} {loan_data['EmprunteurLivre']['prenom']}"
+        due_date = loan_data['dateRetourPrevue']
+
+        CTkLabel(self, text=book_info, font=("Arial", 15, "bold")).pack(side=LEFT, padx=10)
+        CTkLabel(self, text=borrower_info, font=("Arial", 15)).pack(side=LEFT, padx=10)
+        CTkLabel(self, text=f"Due: {due_date}", font=("Arial", 15)).pack(side=LEFT, padx=10)
+
+        return_btn = CTkButton(self, text="Return", command=lambda: return_callback(loan_data))
+        return_btn.pack(side=RIGHT, padx=5)
+
+        extend_btn = CTkButton(self, text="Extend", command=lambda: extend_callback(loan_data))
+        extend_btn.pack(side=RIGHT, padx=5)
+
+        delete_btn = CTkButton(self, text="Delete", fg_color="red", command=lambda: delete_callback(loan_data))
+        delete_btn.pack(side=RIGHT, padx=5)
+
+
+class EmpruntsFrame(CTkFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
-        self.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-        
-        # Header
-        CTkLabel(self, text='ID', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=0)
-        CTkLabel(self, text='Livre', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=1)
-        CTkLabel(self, text='Empruteur', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=2)
-        CTkLabel(self, text='Etat', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=3)
-        CTkLabel(self, text='Date de retour prevue', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=4)
-        CTkLabel(self, text='Date de retour effective', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=5)
-        CTkLabel(self, text='Action', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=6)
-        CTkFrame(self, height=2, width=1700, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a")).grid(row=1, column=0, columnspan=7)
-        
-        self.row = 2
-        self.display_emprunts(Emprnts)
-        self.columnconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
+        self.configure(fg_color=("#fff", "#1e1e1e"))
 
-    def display_emprunts(self, emprunts):
-        for widget in self.grid_slaves():
-            if int(widget.grid_info()["row"]) > 1:
-                widget.grid_forget()
-        
-        for elt in emprunts:
-            col = 0
-            dREff = elt.getDateRetourEffective() if elt.getDateRetourEffective() else '-'
-            for SudoElt in [elt.getCode(), elt.getLivreEmprunte().get_titre(), str(elt.getEmprunteurLivre().get_nom() +" "+ elt.getEmprunteurLivre().get_prenomm()), elt.etatEmprunt(), elt.getDateRetourPrevue(), dREff]:
-                if len(str(SudoElt)) >= 20:
-                    text = str(SudoElt)[:21]+'...'
-                else:
-                    text = str(SudoElt)
-                if str(SudoElt) == 'rendu':
-                    bg = '#77c67c'
-                    pdy = 0
-                elif str(SudoElt) == 'en cours':
-                    bg = ('#63f3fd', '#00ccff')
-                    pdy = 0
-                elif str(SudoElt) == 'non rendu':
-                    bg = '#ff1900'
-                    pdy = 0
-                else:
-                    bg = 'transparent'
-                    pdy = 15
-                CTkLabel(self, text=text, justify="center", corner_radius=50, fg_color=bg, pady=pdy).grid(row=self.row, column=col)
-                col += 1
-            CTkLabel(self, text='', justify="center", compound='center', anchor='center', image=penIcon).grid(row=self.row, column=6)
-            self.row += 1
+        self.loans_list = []
+        self.load_loans()
 
-    def search_emprunts(self, search_term):
-        filtered_emprunts = [elt for elt in Emprnts if search_term.lower() in elt.getLivreEmprunte().get_titre().lower() or search_term.lower() in str(elt.getCode()).lower() or search_term.lower() in str(elt.getEmprunteurLivre().code).lower() or search_term.lower() in str(f'{elt.getEmprunteurLivre().get_nom()} {elt.getEmprunteurLivre().get_prenomm()}').lower()]
-        self.row = 2
-        self.display_emprunts(filtered_emprunts)
-    def filter(self, filter):
-        if filter == 'tous':
-            self.display_emprunts(Emprnts)
-            return
-        filtered_emprunts = [elt for elt in Emprnts if elt.etatEmprunt() == filter]
-        self.row = 2
-        self.display_emprunts(filtered_emprunts)
+        self.list_frame = CTkScrollableFrame(self, fg_color=("#fff", "#1e1e1e"))
+        self.list_frame.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
-Emp = EmpruntItem(EmpruntsFrame)
+        self.display_loans()
 
-def on_search(event):
-    keyword = searchInput.get()
-    Emp.search_emprunts(keyword)
+    def load_loans(self):
+        try:
+            with open("Database/Emprunts.txt", "r") as file:
+                self.loans_list = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.loans_list = []
 
-searchInput.bind("<KeyRelease>", on_search)
+    def save_loans(self):
+        with open("Database/Emprunts.txt", "w") as file:
+            json.dump(self.loans_list, file, indent=4)
 
-# Position
+    def display_loans(self):
+        for widget in self.list_frame.winfo_children():
+            widget.destroy()
+
+        for loan in self.loans_list:
+            LoanItem(self.list_frame, loan, self.return_book, self.extend_loan, self.delete_loan).pack(fill=X, padx=10,
+                                                                                                       pady=5)
+
+    def return_book(self, loan):
+        self.loans_list.remove(loan)
+        self.save_loans()
+        self.display_loans()
+
+    def extend_loan(self, loan):
+        loan['dateRetourPrevue'] = "Extended Date"  # Placeholder for actual logic
+        self.save_loans()
+        self.display_loans()
+
+    def delete_loan(self, loan):
+        self.loans_list.remove(loan)
+        self.save_loans()
+        self.display_loans()
+empruntsZ = EmpruntsFrame(empruntsContent)
+empruntsZ.pack(fill=BOTH, expand=True)
+#Position
 searchFrame.pack(side=TOP, fill=X, pady=0, padx=0)
-EmpruntsFrame.pack(side=TOP, fill=BOTH, expand=True, pady=(5, 5), padx=0)
-searchInput.pack(side=LEFT, fill=X, expand=True, padx=0, pady=0)
-filterCombo.pack(side=LEFT, fill=X, expand=False, padx=(5, 0), pady=0)
-AddEmp.pack(side=LEFT, expand=False, padx=(5, 0), pady=0)
+searchInput.pack(side=LEFT, fill=X, expand=True, padx=10, pady=10)
 
 #-------Ajouter un livre-------------------------------------------------------------------
 ajouterLivreContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)

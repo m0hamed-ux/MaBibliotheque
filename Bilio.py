@@ -223,7 +223,7 @@ class Biblio:
     def get_all_clients(self):
         return self.__adherents
     def get_all_emprunts(self):
-        return list(self.__emprunts.values())
+        return self.__emprunts.values()
     def TopLivres(self):
         return sorted(self.__livres.values(), key=lambda x: x.getNbrEmprunt(), reverse=True)
     def save_livres_csv(self):
