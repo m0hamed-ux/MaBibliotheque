@@ -1,2 +1,146 @@
 [
+    {
+        "code": 1,
+        "livreEmprunte": {
+            "code": "L1234",
+            "titre": "The Subtle Art of Not Giving a F*ck",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 9,
+            "nbrEmprunt": 6
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-14",
+        "dateRetourPrevue": "2025-01-17",
+        "dateRetourEffective": "2025-02-14"
+    },
+    {
+        "code": 2,
+        "livreEmprunte": {
+            "code": "L1234",
+            "titre": "The Subtle Art of Not Giving a F*ck",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 9,
+            "nbrEmprunt": 6
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-14",
+        "dateRetourPrevue": "2025-02-17",
+        "dateRetourEffective": null
+    },
+    {
+        "code": 3,
+        "livreEmprunte": {
+            "code": "L1234",
+            "titre": "The Subtle Art of Not Giving a F*ck",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 9,
+            "nbrEmprunt": 6
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-14",
+        "dateRetourPrevue": "2025-02-17",
+        "dateRetourEffective": "2025-02-14"
+    },
+    {
+        "code": 4,
+        "livreEmprunte": {
+            "code": "L1234",
+            "titre": "The Subtle Art of Not Giving a F*ck",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 9,
+            "nbrEmprunt": 6
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-14",
+        "dateRetourPrevue": "2025-02-17",
+        "dateRetourEffective": "2025-02-14"
+    },
+    {
+        "code": 5,
+        "livreEmprunte": {
+            "code": "L1234",
+            "titre": "The Subtle Art of Not Giving a F*ck",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 9,
+            "nbrEmprunt": 6
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-14",
+        "dateRetourPrevue": "2025-02-17",
+        "dateRetourEffective": "2025-02-14"
+    },
+    {
+        "code": 6,
+        "livreEmprunte": {
+            "code": "L1234",
+            "titre": "The Subtle Art of Not Giving a F*ck",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 9,
+            "nbrEmprunt": 6
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-14",
+        "dateRetourPrevue": "2025-02-17",
+        "dateRetourEffective": null
+    }
 ]

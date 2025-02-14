@@ -164,10 +164,11 @@ class Biblio:
         emprunt = self.__emprunts.get(int(codeEmprunt))
         if emprunt:
             if emprunt.etatEmprunt() != "rendu" or not emprunt.getDateRetourEffective():
-                emprunt.setDateRetourEffective(date.today())
-                # emprunt.getLivreEmprunte().set_nbr_exemplaire_disponible(emprunt.getLivreEmprunte().get_nbr_exemplaire_disponible()+1) 
+                emprunt.setDateRetourEffective(date.today()) 
                 livreCode = emprunt.getLivreEmprunte().get_code()
-                self.__livres[livreCode].set_nbr_exemplaire_disponible(emprunt.getLivreEmprunte().get_nbr_exemplaire_disponible()+1) 
+                livre = self.rechercherLivre(livreCode)
+                livre.set_nbr_exemplaire_disponible(livre.get_nbr_exemplaire_disponible()+1)
+                print(self.__livres[livreCode].get_nbr_exemplaire_disponible())
                 self.save_data()
                 return True
             else:

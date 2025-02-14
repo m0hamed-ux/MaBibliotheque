@@ -4,6 +4,7 @@ from tkcalendar import *
 from tkinter import ttk
 from customtkinter import *
 import PIL
+from PIL import ImageTk
 from Bilio import *
 import json
 import json as js
@@ -462,7 +463,7 @@ class EmpruntItem(CTkFrame):
                 label = CTkLabel(self, text=text, justify="center", corner_radius=50, fg_color=bg, pady=pdy)
                 label.grid(row=self.row, column=col)
                 col += 1
-            Action = CTkLabel(self, text='', justify="center", compound='center', anchor='center', image=penIcon)
+            Action = CTkLabel(self, text='', justify="center", compound='center', anchor='center', image=penIcon, cursor='hand2')
             Action.grid(row=self.row, column=6)
             Action.bind("<Button-1>", lambda e, code=elt.getCode(): self.retour(code))
             self.row += 1
@@ -480,15 +481,14 @@ class EmpruntItem(CTkFrame):
         self.row = 2
         self.display_emprunts(filtered_emprunts)
 
-    def print_id(self, code):
-        print(f"ID of clicked row: {code}")
     def retour(self, code):
-        if messagebox.askokcancel('retour un emprunt', 'retour un emprunt'):
+        if messagebox.askyesno('Retour d\'un emprunt', f'Etes-vous sur de vouloir retourner l\'emprunt N° {code}?'):
             try:
                 gestion.retourEmprunt(code)
                 self.display_emprunts(Emprnts)
+                messagebox.showinfo('Succes', 'Emprunt retourne avec succes')
             except Exception as e:
-                messagebox.showerror('error', str(e))
+                messagebox.showerror('Erreur', str(e))
                 print(e)
 
 Emp = EmpruntItem(EmpruntsFrame)
@@ -509,6 +509,125 @@ AddEmp.pack(side=LEFT, expand=False, padx=(5, 0), pady=0)
 #-------Ajouter un livre-------------------------------------------------------------------
 ajouterLivreContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+# ajouterLivreContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+# frame2 = CTkFrame(ajouterLivreContent,corner_radius=10)
+# frame2.pack(pady=10, padx=20,expand=True)
+
+# # Ajout de l'image
+# image_label = CTkLabel(frame2, text="Aucune image sélectionnée", width=200, height=250)
+# image_label.grid(row=0, column=0, rowspan=7, padx=20, pady=5)
+
+# selected_image_path = None
+
+# def choisir_image():
+#     global selected_image_path
+#     filepath = filedialog.askopenfilename(filetypes=[("Images", "*.png;*.jpg;*.jpeg")])
+#     if filepath:
+#         selected_image_path = filepath
+#         img = Image.open(filepath)
+#         img = img.resize((150, 200), Image.LANCZOS)
+#         img = ImageTk.PhotoImage(img)
+#         image_label.configure(image=img, text="")
+#         image_label.image = img  # Garde une référence pour éviter la suppression
+
+# # Création des entrées
+# CTkLabel(frame2, text="Code du livre:").grid(row=0, column=1, sticky="w")
+# entry_codee = CTkEntry(frame2, placeholder_text="Code du livre", width=250)
+# entry_codee.grid(row=0, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Titre:").grid(row=1, column=1, sticky="w")
+# entry_titre = CTkEntry(frame2, placeholder_text="Titre", width=250)
+# entry_titre.grid(row=1, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Nom de l'auteur:").grid(row=2, column=1, sticky="w")
+# entry_nom = CTkEntry(frame2, placeholder_text="Nom de l'auteur", width=250)
+# entry_nom.grid(row=2, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Prénom de l'auteur:").grid(row=3, column=1, sticky="w")
+# entry_prenom = CTkEntry(frame2, placeholder_text="Prénom de l'auteur", width=250)
+# entry_prenom.grid(row=3, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Code de l'auteur:").grid(row=4, column=1, sticky="w")
+# entry_code = CTkEntry(frame2, placeholder_text="Code de l'auteur", width=250)
+# entry_code.grid(row=4, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Nombre total:").grid(row=5, column=1, sticky="w")
+# entry_total = CTkEntry(frame2, placeholder_text="Nombre total d'exemplaires", width=250)
+# entry_total.grid(row=5, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Nombre disponible:").grid(row=6, column=1, sticky="w")
+# entry_disponible = CTkEntry(frame2, placeholder_text="Nombre disponible d'exemplaires", width=250)
+# entry_disponible.grid(row=6, column=2, padx=10, pady=5)
+
+# CTkLabel(frame2, text="Nombre d'emprunts:").grid(row=7, column=1, sticky="w")
+# entry_emprunt = CTkEntry(frame2, placeholder_text="Nombre d'emprunts", width=250)
+# entry_emprunt.grid(row=7, column=2, padx=10, pady=5)
+
+# def ajouterLivre():
+#     code = entry_codee.get()
+#     if not code:
+#         messagebox.showerror("Erreur", "Veuillez entrer un code de livre !")
+#         return
+
+#     if not os.path.exists("Database"):
+#         os.makedirs("Database")
+
+#     titre=entry_titre.get()
+#     nomA=entry_nom.get()
+#     prenomA=entry_prenom.get()
+#     codeA=entry_code.get()
+#     nbrTtl=entry_total.get()
+#     nbrDispo=entry_disponible.get()
+
+
+#     try:
+#         lvr = livre(code, titre, nbrTtl, nbrDispo)
+#     except Exception as e:
+#         messagebox.showerror("Erreur",e)
+
+#     gestion.ajouterLivre(lvr)
+
+#     for livre in livres:
+#         if livre["code"] == code:
+#             return
+
+#     livres.append(livre)
+# def afficherLivres():
+#     new_window = Toplevel(app)
+#     new_window.title("Liste des livres")
+#     new_window.geometry("1920x1080")
+
+#     try:
+#         with open("Database/livres.json", "r") as f:
+#             livres = json.load(f)
+#     except (FileNotFoundError, json.JSONDecodeError):
+#         livres = []
+
+#     table_frame = CTkFrame(new_window)
+#     table_frame.pack(fill="both", expand=True)
+
+#     for i, livre in enumerate(livres, start=1):
+#         CTkLabel(table_frame, text=livre["titre"], width=200, anchor="w").grid(row=i, column=0, padx=5, pady=5)
+#         CTkLabel(table_frame, text=livre["auteur"]["nom"] + " " + livre["auteur"]["prenom"], width=200, anchor="w").grid(row=i, column=1, padx=5, pady=5)
+#         CTkLabel(table_frame, text=livre["nbr_total"], width=100, anchor="w").grid(row=i, column=2, padx=5, pady=5)
+#         CTkLabel(table_frame, text=livre["nbr_emprunt"], width=100, anchor="w").grid(row=i, column=3, padx=5, pady=5)
+#         if livre["image"]:
+#             img = Image.open(livre["image"])
+#             img = img.resize((100, 150), Image.LANCZOS)
+#             img = ImageTk.PhotoImage(img)
+#             img_label = CTkLabel(table_frame, image=img)
+#             img_label.image = img
+#             img_label.grid(row=i, column=4, padx=5, pady=5)
+
+# ajouter_button = CTkButton(frame2, text="Ajouter un livre", command=ajouterLivre)
+# ajouter_button.grid(row=8, column=0, columnspan=2, pady=30)
+
+# image_button = CTkButton(frame2, text="Choisir une image", command=choisir_image)
+# image_button.grid(row=8, column=1, columnspan=2, pady=30,padx=10)
+
+# afficher_button = CTkButton(frame2, text="Afficher les livres", command=afficherLivres)
+# afficher_button.grid(row=8, column=3, columnspan=2, pady=30,padx=(0,20))
+# ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
 #-------Ajouter un emprunt-------------------------------------------------------------------
 ajouterEmpruntContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
