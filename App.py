@@ -459,15 +459,19 @@ class EmpruntItem(CTkFrame):
                 else:
                     bg = 'transparent'
                     pdy = 15
-                CTkLabel(self, text=text, justify="center", corner_radius=50, fg_color=bg, pady=pdy).grid(row=self.row, column=col)
+                label = CTkLabel(self, text=text, justify="center", corner_radius=50, fg_color=bg, pady=pdy)
+                label.grid(row=self.row, column=col)
                 col += 1
-            CTkLabel(self, text='', justify="center", compound='center', anchor='center', image=penIcon).grid(row=self.row, column=6)
+            Action = CTkLabel(self, text='', justify="center", compound='center', anchor='center', image=penIcon)
+            Action.grid(row=self.row, column=6)
+            Action.bind("<Button-1>", lambda e, code=elt.getCode(): self.retour(code))
             self.row += 1
 
     def search_emprunts(self, search_term):
         filtered_emprunts = [elt for elt in Emprnts if search_term.lower() in elt.getLivreEmprunte().get_titre().lower() or search_term.lower() in str(elt.getCode()).lower() or search_term.lower() in str(elt.getEmprunteurLivre().code).lower() or search_term.lower() in str(f'{elt.getEmprunteurLivre().get_nom()} {elt.getEmprunteurLivre().get_prenomm()}').lower()]
         self.row = 2
         self.display_emprunts(filtered_emprunts)
+
     def filter(self, filter):
         if filter == 'tous':
             self.display_emprunts(Emprnts)
@@ -475,6 +479,17 @@ class EmpruntItem(CTkFrame):
         filtered_emprunts = [elt for elt in Emprnts if elt.etatEmprunt() == filter]
         self.row = 2
         self.display_emprunts(filtered_emprunts)
+
+    def print_id(self, code):
+        print(f"ID of clicked row: {code}")
+    def retour(self, code):
+        if messagebox.askokcancel('retour un emprunt', 'retour un emprunt'):
+            try:
+                gestion.retourEmprunt(code)
+                self.display_emprunts(Emprnts)
+            except Exception as e:
+                messagebox.showerror('error', str(e))
+                print(e)
 
 Emp = EmpruntItem(EmpruntsFrame)
 

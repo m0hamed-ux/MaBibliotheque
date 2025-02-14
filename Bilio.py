@@ -130,11 +130,9 @@ class Biblio:
 
             with open("Database/emprunts.json", "w") as f:
                 json.dump(emprunts, f, indent=4)
-            # update recent activities
             f = open("Database/recentActivities.txt", "a")
             f.write(f"L'adherent {adherent.getCode()} a emprunte le livre {livre.get_code()} le {dateEmprunt.strftime('%d/%m/%Y')}\n")
-            f.close()
-            # Update emprunts.txt 
+            f.close() 
             try:
                 with open("Database/emprunts.txt", "r") as f:
                     lines = f.readlines()
@@ -165,9 +163,11 @@ class Biblio:
     def retourEmprunt(self,codeEmprunt):
         emprunt = self.__emprunts.get(int(codeEmprunt))
         if emprunt:
-            if emprunt.etatEmprunt() != "rendu" or emprunt.getDateRetourEffective():
+            if emprunt.etatEmprunt() != "rendu" or not emprunt.getDateRetourEffective():
                 emprunt.setDateRetourEffective(date.today())
-                emprunt.getLivreEmprunte().set_nbr_exemplaire_disponible(emprunt.getLivreEmprunte().get_nbr_exemplaire_disponible()+1) 
+                # emprunt.getLivreEmprunte().set_nbr_exemplaire_disponible(emprunt.getLivreEmprunte().get_nbr_exemplaire_disponible()+1) 
+                livreCode = emprunt.getLivreEmprunte().get_code()
+                self.__livres[livreCode].set_nbr_exemplaire_disponible(emprunt.getLivreEmprunte().get_nbr_exemplaire_disponible()+1) 
                 self.save_data()
                 return True
             else:

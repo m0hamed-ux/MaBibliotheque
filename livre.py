@@ -1,7 +1,7 @@
 import re
 from Auteur import *
 class livre:
-    def __init__(self,code,titre,auteur,nbr_ttl_exemplaire,nbr_exemplaire_disponible):
+    def __init__(self,code,titre,auteur,nbr_ttl_exemplaire,nbr_exemplaire_disponible, nbrEmprunt=0):
         self.template=r"^L\d{4}$"
         if not re.match(self.template,code):
             raise Exception("Le code inserer doit commencer par la lettre 'L' majiscule suivie par quatre chiffre ")
@@ -17,7 +17,7 @@ class livre:
             self.__titre=titre
             self.__nbr_ttl_exemplaire=nbr_ttl_exemplaire
             self.__nbr_exemplaire_disponible=nbr_exemplaire_disponible
-            self.__nbrEmprunt = 0
+            self.__nbrEmprunt = nbrEmprunt
 
             
 
@@ -84,24 +84,11 @@ class livre:
         }
     @classmethod
     def from_dict(cls, data):
-        """Create a livre instance from a dictionary"""
-        # Create Auteur instance from the nested author data
-        auteur_data = data["auteur"]
-        auteur = Auteur(
-            nom=auteur_data["nom"],
-            prenom=auteur_data["prenom"],
-            code=auteur_data["code"]
+        return cls(
+            data["code"],
+            data["titre"],
+            Auteur.from_dict(data["auteur"]),
+            data["nbr_ttl_exemplaire"],
+            data["nbr_exemplaire_disponible"],
+            nbrEmprunt=data['nbrEmprunt']
         )
-        
-        # Create the livre instance
-        livre_instance = cls(
-            code=data["code"],
-            titre=data["titre"],
-            auteur=auteur,
-            nbr_ttl_exemplaire=int(data["nbr_ttl_exemplaire"]),
-            nbr_exemplaire_disponible=int(data["nbr_exemplaire_disponible"])
-        )
-        
-        # Set the nbrEmprunt value after creation using direct attribute access
-        livre_instance._livre__nbrEmprunt = int(data.get("nbrEmprunt", 0))
-        return livre_instance
