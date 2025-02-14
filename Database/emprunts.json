@@ -45,7 +45,7 @@
         },
         "dateEmprunt": "2025-02-14",
         "dateRetourPrevue": "2025-02-17",
-        "dateRetourEffective": null
+        "dateRetourEffective": "2025-02-14"
     },
     {
         "code": 3,
@@ -141,6 +141,6 @@
         },
         "dateEmprunt": "2025-02-14",
         "dateRetourPrevue": "2025-02-17",
-        "dateRetourEffective": null
+        "dateRetourEffective": "2025-02-14"
     }
 ]

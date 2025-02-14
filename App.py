@@ -166,7 +166,7 @@ def updateStats():
 
 set_appearance_mode("dark")
 currentFrame="Accueil"
-app = CTk()
+app = Tk()
 app.title("Bibliotheque")
 app.geometry("1000x600")
 app.iconbitmap("images/logo.ico")
@@ -412,7 +412,7 @@ empruntsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 searchFrame = CTkFrame(empruntsContent, fg_color='transparent', corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 searchInput = CTkEntry(searchFrame, placeholder_text='Rechercher par livre, code Emprunt, Adherent', fg_color=("#fff", "#1e1e1e"), corner_radius=7, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), height=35)
 filterCombo = CTkComboBox(searchFrame, values=['tous', 'rendu','en cours', 'non rendu'], corner_radius=7, height=35, fg_color=("#e2e8f0", "#27272a"), button_color=("#e2e8f0", "#27272a"), button_hover_color="#515153", border_color=("#e2e8f0", "#27272a"), command=lambda e: Emp.filter(e))
-AddEmp = CTkButton(searchFrame, text='Ajouter', fg_color=('#000', '#1e1e1e'), corner_radius=7, border_width=0, border_color=("#e2e8f0", "#1e1e1e"), height=35, text_color="#fff",hover_color=('#515153','#515153'), compound='left', anchor='center', image=plusIconLight, cursor='hand2', command=lambda: BtnColor("Ajouter un livre") & updateMain("Ajouter un livre"))
+AddEmp = CTkButton(searchFrame, text='Ajouter', fg_color=('#000', '#1e1e1e'), corner_radius=7, border_width=0, border_color=("#e2e8f0", "#1e1e1e"), height=35, text_color="#fff",hover_color=('#515153','#515153'), compound='left', anchor='center', image=plusIconLight, cursor='hand2', command=lambda: BtnColor("Ajouter un emprunt") & updateMain("Ajouter un emprunt"))
 EmpruntsFrame = CTkScrollableFrame(empruntsContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 
 class EmpruntItem(CTkFrame):
