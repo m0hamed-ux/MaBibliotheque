@@ -142,5 +142,125 @@
         "dateEmprunt": "2025-02-14",
         "dateRetourPrevue": "2025-02-17",
         "dateRetourEffective": "2025-02-14"
+    },
+    {
+        "code": 7,
+        "livreEmprunte": {
+            "code": "L1111",
+            "titre": "Test",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 14,
+            "nbrEmprunt": 1
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-15",
+        "dateRetourPrevue": "2025-02-18",
+        "dateRetourEffective": "2025-02-15"
+    },
+    {
+        "code": 8,
+        "livreEmprunte": {
+            "code": "L1111",
+            "titre": "Test",
+            "auteur": {
+                "nom": "Manson",
+                "prenom": "Mark",
+                "code": "A1234"
+            },
+            "nbr_ttl_exemplaire": 15,
+            "nbr_exemplaire_disponible": 15,
+            "nbrEmprunt": 2
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-15",
+        "dateRetourPrevue": "2025-02-18",
+        "dateRetourEffective": "2025-02-15"
+    },
+    {
+        "code": 9,
+        "livreEmprunte": {
+            "code": "L0000",
+            "titre": "Test2",
+            "auteur": {
+                "nom": "AAA",
+                "prenom": "BBB",
+                "code": "A9900"
+            },
+            "nbr_ttl_exemplaire": 20,
+            "nbr_exemplaire_disponible": 19,
+            "nbrEmprunt": 1
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-15",
+        "dateRetourPrevue": "2025-02-18",
+        "dateRetourEffective": null
+    },
+    {
+        "code": 10,
+        "livreEmprunte": {
+            "code": "L0000",
+            "titre": "Test2",
+            "auteur": {
+                "nom": "AAA",
+                "prenom": "BBB",
+                "code": "A9900"
+            },
+            "nbr_ttl_exemplaire": 20,
+            "nbr_exemplaire_disponible": 17,
+            "nbrEmprunt": 3
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-15",
+        "dateRetourPrevue": "2025-02-18",
+        "dateRetourEffective": null
+    },
+    {
+        "code": 11,
+        "livreEmprunte": {
+            "code": "L0000",
+            "titre": "Test2",
+            "auteur": {
+                "nom": "AAA",
+                "prenom": "BBB",
+                "code": "A9900"
+            },
+            "nbr_ttl_exemplaire": 20,
+            "nbr_exemplaire_disponible": 17,
+            "nbrEmprunt": 3
+        },
+        "EmprunteurLivre": {
+            "nom": "ali",
+            "prenom": "Ahmed",
+            "dateAdhesion": "2020-01-01",
+            "code": 1
+        },
+        "dateEmprunt": "2025-02-15",
+        "dateRetourPrevue": "2025-02-18",
+        "dateRetourEffective": null
     }
 ]

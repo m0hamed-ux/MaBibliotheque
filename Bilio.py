@@ -50,17 +50,8 @@ class Biblio:
             json.dump([emprunt.to_dict() for emprunt in self.__emprunts.values()], f, indent=4)
 
 
-    def ajouterLivre(self):
-        print("---Saisir les information de livre :---")
-        code = input("Code (Ex : L1234) : ")
-        if code in self.__livres:
-            raise Exception("Il existe déjà un livre avec ce code !")
-        titre = input("Titre : ")
-        print("Les Informations d'auteur : ")
-        auteur = Auteur(input("├── Nom : "), input("├── Prenom : "), input("├── Code (Ex : A1234) : "))
-        nbr_ttl_exemplaire = int(input("Le nombre total des exemplaires : "))
-        lvr = livre(code, titre, auteur, nbr_ttl_exemplaire, nbr_ttl_exemplaire)
-        self.__livres[code] = lvr
+    def ajouterLivre(self, lvr : livre):
+        self.__livres[lvr.get_code()] = lvr
         try:
             with open("Database/livres.json", "r") as f:
                 livres = json.load(f)

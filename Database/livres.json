@@ -10,5 +10,29 @@
         "nbr_ttl_exemplaire": 15,
         "nbr_exemplaire_disponible": 12,
         "nbrEmprunt": 6
+    },
+    {
+        "code": "L1111",
+        "titre": "Test",
+        "auteur": {
+            "nom": "Manson",
+            "prenom": "Mark",
+            "code": "A1234"
+        },
+        "nbr_ttl_exemplaire": 15,
+        "nbr_exemplaire_disponible": 15,
+        "nbrEmprunt": 2
+    },
+    {
+        "code": "L0000",
+        "titre": "Test2",
+        "auteur": {
+            "nom": "AAA",
+            "prenom": "BBB",
+            "code": "A9900"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 17,
+        "nbrEmprunt": 3
     }
 ]
