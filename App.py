@@ -728,15 +728,29 @@ themeFrame.pack(side=TOP, fill=X, padx=20, pady=10)
 themeLabel = CTkLabel(themeFrame, text="Thème", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
 themeLabel.pack(side=TOP, anchor="w", pady=(0, 10))
 
-themeVar = StringVar(value="Dark" if get_appearance_mode() == "Dark" else "Light")
+themeVar = IntVar()
 
 def update_theme():
     theme = themeVar.get()
-    set_appearance_mode(theme.lower())
+    set_appearance_mode('dark' if theme == 1 else 'light')
     update_menu_colors()
+    with open("Database/settings.json", "r") as file:
+        data_dict = js.load(file)
+    data_dict["theme"] = 'dark' if themeVar.get() == 1 else 'light'
+    with open("Database/settings.json", "w") as file:
+        js.dump(data_dict, file, indent=4)
+def getTheme():
+    with open("Database/settings.json", "r") as file:
+        data_dict = js.load(file)
+    Ctheme = data_dict["theme"]
+    themeVar.set(1 if Ctheme.lower() == 'dark' else 2)
+getTheme()
 
-CTkRadioButton(themeFrame, text="Mode Sombre", variable=themeVar, value="Dark", font=("Roboto", 14), command=update_theme).pack(side=TOP, anchor="w", pady=5)
-CTkRadioButton(themeFrame, text="Mode Clair", variable=themeVar, value="Light", font=("Roboto", 14), command=update_theme).pack(side=TOP, anchor="w", pady=5)
+darkCmb = CTkRadioButton(themeFrame, text="Dark mode",variable=themeVar, value=1, font=("Roboto", 14), command=update_theme)
+darkCmb.pack(side=TOP, anchor="w", pady=5)
+lightCmb = CTkRadioButton(themeFrame, text="Light mode", variable=themeVar, value=2, font=("Roboto", 14), command=update_theme)
+lightCmb.pack(side=TOP, anchor="w", pady=5)
+
 
 languageFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
 languageFrame.pack(side=TOP, fill=X, padx=20, pady=10)
