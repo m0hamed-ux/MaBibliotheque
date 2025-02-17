@@ -3,13 +3,24 @@ from Adherent import *
 from Auteur import *
 from Emprunt import *
 from datetime import date
-import json
+import json as js
 import csv
 class Biblio:
     def __init__(self):
         self.__livres={}
         self.__adherents={}
         self.__emprunts={}
+    def getDefault(self):
+        try:
+            with open("Database/settings.json", "r") as file:
+                data_dict = js.load(file)
+                self.empruntPeriod = data_dict['empruntPeriod']
+                self.maxLivres = data_dict['maxLivres']
+        except:
+            self.empruntPeriod = 3
+            self.maxLivres = 2
+        print(self.empruntPeriod)
+        print(self.maxLivres)
     def load_data(self):
         """Load data from JSON files, creating them if they don't exist"""
         try:
@@ -66,35 +77,74 @@ class Biblio:
         f = open("Database/recentActivities.txt", "a")
         f.write(f"Le livre {lvr.get_titre()} a ete ajoute le {date.today().strftime('%d/%m/%Y')}\n")
         f.close()
-    def ajouterAdherent(self):
-        print("---Saisir les information de l'adherent :---")
-        nom = input("Nom : ")
-        prenom = input("Prenom : ")
-        print("La date d'adhésion : ")
-        day = int(input("├── Jour : "))
-        month = int(input("├── Mois : "))
-        year = int(input("├── Annee : "))
+    def ajouterAdherent(self, nom, prenom, dateAdhesion):
+        Adh = Adherent(nom, prenom, dateAdhesion)
+        self.__adherents[Adh.getCode()] = Adh
+        print(self.__adherents)
+        f = open("Database/recentActivities.txt", "a")
+        f.write(f"L'adherent {Adh.get_nom()} {Adh.get_prenomm()} a ete ajoute le {dateAdhesion.strftime('%d/%m/%Y')}\n")
+        f.close()
         try:
-            dateAdhesion = date(year, month, day)
-        except Exception as e:
-            print(e)
-        else:
-            Adh = Adherent(nom, prenom, dateAdhesion)
-            self.__adherents[Adh.getCode()] = Adh
-            # update recent activities
-            f = open("Database/recentActivities.txt", "a")
-            f.write(f"L'adherent {Adh.get_nom()} {Adh.get_prenomm()} a ete ajoute le {dateAdhesion.strftime('%d/%m/%Y')}\n")
-            f.close()
+            with open("Database/adherent.json", "r") as f:
+                adherents = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            adherents = []
+        adherents.append(Adh.to_dict())
+        with open("Database/adherent.json", "w") as f:
+            json.dump(adherents, f, indent=4)
+    def supprimerAdherent(self, codeAdherent):
+        adherent = self.__adherents.pop(codeAdherent, None)
+        if adherent:
             try:
                 with open("Database/adherent.json", "r") as f:
                     adherents = json.load(f)
             except (FileNotFoundError, json.JSONDecodeError):
                 adherents = []
 
-            adherents.append(Adh.to_dict())
+            adherents = [adh for adh in adherents if adh['code'] != codeAdherent]
 
             with open("Database/adherent.json", "w") as f:
                 json.dump(adherents, f, indent=4)
+
+            f = open("Database/recentActivities.txt", "a")
+            f.write(f"L'adherent {adherent.get_nom()} {adherent.get_prenomm()} a ete supprime le {date.today().strftime('%d/%m/%Y')}\n")
+            f.close()
+        else:
+            raise Exception("Adherent introuvable.")
+    def modifierAdherent(self, codeAdherent, nom=None, prenom=None, dateAdhesion=None):
+        adherent = self.__adherents[codeAdherent]
+        if not adherent:
+            raise Exception("Adherent introuvable.")
+        
+        if nom:
+            adherent.set_nom(nom)
+        if prenom:
+            adherent.set_prenom(prenom)
+        if dateAdhesion:
+            adherent.setDateAdhesion(dateAdhesion)
+        self.__adherents[codeAdherent] = adherent
+        try:
+            with open("Database/adherent.json", "r") as f:
+                adherents = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            adherents = []
+        
+        for adh in adherents:
+            if adh['code'] == codeAdherent:
+                if nom:
+                    adh['nom'] = nom
+                if prenom:
+                    adh['prenom'] = prenom
+                if dateAdhesion:
+                    adh['dateAdhesion'] = dateAdhesion.strftime('%Y-%m-%d')
+                break
+        
+        with open("Database/adherent.json", "w") as f:
+            json.dump(adherents, f, indent=4)
+        
+        f = open("Database/recentActivities.txt", "a")
+        f.write(f"L'adherent {adherent.get_nom()} {adherent.get_prenomm()} a ete modifie le {date.today().strftime('%d/%m/%Y')}\n")
+        f.close()
             
     def rechercherAdherent(self,code):
         return self.__adherents.get(int(code))
@@ -161,6 +211,9 @@ class Biblio:
                 livre.set_nbr_exemplaire_disponible(livre.get_nbr_exemplaire_disponible()+1)
                 print(self.__livres[livreCode].get_nbr_exemplaire_disponible())
                 self.save_data()
+                f = open("Database/recentActivities.txt", "a")
+                f.write(f"L'emprunt {codeEmprunt} a ete retourne le {date.today().strftime('%d/%m/%Y')}\n")
+                f.close()
                 return True
             else:
                 raise Exception("Ce livre est deja rendu")

@@ -1,681 +1,512 @@
-from tkinter import *
-from tkinter import messagebox
-from tkcalendar import *
-from tkinter import ttk
 from customtkinter import *
-import PIL
-from Bilio import *
+from tkinter import messagebox, ttk
+from datetime import date
 import json
-import json as js
-from Adherent import Adherent
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from chart import *
+from Bilio import *
+from Adherent import *
+import PIL
+from tkcalendar import DateEntry
 
 
 
-
-#Gestion
 gestion = Biblio()
 gestion.load_data()
-totalBooks = len(gestion.get_livres())
-TotalCopies = gestion.getTotalCopies()
-availableBooks = len(gestion.get_available_books())
-TotalAvailableCopies = gestion.getTotalAvailableCopies()
-borrowedBooks = TotalCopies - TotalAvailableCopies
-totalClients = len(gestion.get_all_clients())
-top5Books = gestion.TopLivres()
-
-
-def defaultSettings():
-    try:
-        with open("Database/settings.json", "r") as file:
-            data_dict = js.load(file)
-        theme = data_dict["theme"]
-        set_appearance_mode(theme)
-        changeTheme(chart, theme,  7, "Database/Emprunts.txt")
-    except (FileNotFoundError, json.JSONDecodeError, KeyError):
-        set_appearance_mode("light")
-        changeTheme(chart, "light", 7, "Database/Emprunts.txt")
-
-
-
-
-def change_theme():
-    if get_appearance_mode() == "Dark":
-        set_appearance_mode("light")
-        Modevr.set("Light mode")
-        changeTheme(chart, "light", 7, "Database/Emprunts.txt")
-    else:
-        set_appearance_mode("dark")
-
-
-        Modevr.set("Dark mode")
-        changeTheme(chart, "dark", 7, "Database/Emprunts.txt")
-
-
-    update_menu_colors()
-def hideShowSideBar():
-    if sideMenu.winfo_ismapped():
-        sideMenu.pack_forget()
-        border.configure(cursor="sb_right_arrow")
-    else:
-        main.pack_forget()
-        border.pack_forget()
-        sideMenu.pack(side=LEFT, fill=Y)
-        border.pack(side=LEFT, fill=Y)
-        main.pack(side=LEFT, fill=BOTH, expand=YES)
-        border.configure(cursor="sb_left_arrow")
-def BtnColor(button):
-    btnList = [dashboard, books, clients, AddBook, AddLoan, settings, Loans, AddClient]
-    for btn in btnList:
-        if btn.cget("text").strip() == button:
-            btn.configure(fg_color=btnActiveColor, hover=False)
-        else:
-            btn.configure(hover=True,fg_color=bgColor)
-    global currentFrame
-    if button == "Accueil":
-        TitleMain.configure(text="Accueil")
-        currentFrame = "Accueil"
-    elif button == "Livres":
-        TitleMain.configure(text="Livres")
-        currentFrame = "Livres"
-    elif button == "Adherents":
-        TitleMain.configure(text="Adherents")
-        currentFrame = "Adherents"
-    elif button == "Emprunts":
-        TitleMain.configure(text="Emprunts")
-        currentFrame = "Emprunts"
-    elif button == "Ajouter un livre":
-        TitleMain.configure(text="Ajouter un livre")
-        currentFrame = "Ajouter un livre"
-    elif button == "Ajouter un emprunt":
-        TitleMain.configure(text="Ajouter un emprunt")
-        currentFrame = "Ajouter un emprunt"
-    elif button == "Ajouter un adherent":
-        TitleMain.configure(text="Ajouter un adherent")
-        currentFrame = "Ajouter un adherent"
-    elif button == "Paramètres":
-        TitleMain.configure(text="Paramètres")
-        currentFrame = "Paramètres"
-
-
-
-
-def update_menu_colors():
-    current_mode = get_appearance_mode()
-    if current_mode == "Dark":
-        bg_color = bgColor[1]
-        fg_color = "#ffffff"
-        active_bg = btnActiveColor[1]
-        active_fg = "#ffffff"
-    else:
-        bg_color = bgColor[0]
-        fg_color = "#000000"
-        active_bg = btnActiveColor[0]
-        active_fg = "#000000"
-
-    menu_font = ("Arial", 12)
-    menubar.configure(background=bg_color, foreground=fg_color,
-                      activebackground=active_bg, activeforeground=active_fg,
-                      font=menu_font, borderwidth=0)
-    for menu in [file, edit, view, help_, mode, zoom]:
-        menu.configure(background=bg_color, foreground=fg_color,
-                       activebackground=active_bg, activeforeground=active_fg,
-                       font=menu_font, borderwidth=0, border=0)
-def updateMain(frame):
-    dashboardContent.pack_forget()
-    livresContent.pack_forget()
-    adherentsContent.pack_forget()
-    empruntsContent.pack_forget()
-    ajouterLivreContent.pack_forget()
-    ajouterEmpruntContent.pack_forget()
-    ajouterAdherentContent.pack_forget()
-    parametresContent.pack_forget()
-    if frame == "Accueil":
-        dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Livres":
-        livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Adherents":
-        adherentsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Emprunts":
-        empruntsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Ajouter un livre":
-        ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Ajouter un emprunt":
-        ajouterEmpruntContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Ajouter un adherent":
-        ajouterAdherentContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    elif frame == "Paramètres":
-        parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-    else:
-        dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-def updateStats():
-    global totalBooks, availableBooks, borrowedBooks, totalClients, TotalCopies, TotalAvailableCopies, top5Books
-
-
-    totalBooks = len(gestion.get_livres())
-    TotalCopies = gestion.getTotalCopies()
-    availableBooks = len(gestion.get_available_books())
-    TotalAvailableCopies = gestion.getTotalAvailableCopies()
-    borrowedBooks = TotalCopies - TotalAvailableCopies
-    totalClients = len(gestion.get_all_clients())
-    top5Books = gestion.TopLivres()
-
-set_appearance_mode("dark")
-currentFrame="Accueil"
-app = CTk()
-app.title("Bibliotheque")
-app.geometry("1000x600")
-app.iconbitmap("images/logo.ico")
-
-
-
-#Colors
-bgColor = ("#fff", "#18181b")
-mainColor = ("#fff", "#09090b")
-btnActiveColor = ("#3fdfff", "#00b4d8")
-
-#Icons
-logoImage = CTkImage(PIL.Image.open("images/logo.png"), size=(30, 30))
-ThemeIcon = CTkImage(dark_image=PIL.Image.open("images/moon.png"),light_image=PIL.Image.open("images/sun.png") ,size=(20, 20))
-dashboardIcon = CTkImage(dark_image=PIL.Image.open("images/homeLight.png"),light_image=PIL.Image.open("images/home.png"), size=(15, 15))
-plusIcon = CTkImage(dark_image=PIL.Image.open("images/plusLight.png"),light_image=PIL.Image.open("images/plus.png"), size=(15, 15))
-bookIcon = CTkImage(dark_image=PIL.Image.open("images/bookLight.png"),light_image=PIL.Image.open("images/book.png"), size=(15, 15))
-clientsIcon = CTkImage(dark_image=PIL.Image.open("images/clientsLight.png"),light_image=PIL.Image.open("images/clients.png"), size=(15, 15))
-loanIcon = CTkImage(dark_image=PIL.Image.open("images/loanLight.png"),light_image=PIL.Image.open("images/loan.png"), size=(15, 15))
-settingsIcon = CTkImage(dark_image=PIL.Image.open("images/settingsLight.png"),light_image=PIL.Image.open("images/settings.png"), size=(15, 15))
-AddClientIcon = CTkImage(dark_image=PIL.Image.open("images/user-addLight.png"),light_image=PIL.Image.open("images/user-add.png"), size=(15, 15))
-expandIcon = CTkImage(dark_image=PIL.Image.open("images/sidebarLight.png"),light_image=PIL.Image.open("images/sidebar.png"), size=(20, 20))
-stockIcon = CTkImage(PIL.Image.open("images/stock.png"), size=(15, 15))
-exitIcon = CTkImage(PIL.Image.open("images/exit.png"), size=(15, 15))
-
-
-
-
-
-
-
-#Side Menu----------------------------------------------------------------------
-sideMenu = CTkFrame(app, fg_color=bgColor, bg_color=bgColor, border_width=0)
-TitleFrame = CTkFrame(sideMenu, border_width=0, fg_color=bgColor)
-sideTitle = CTkLabel(TitleFrame, text=" MaBibliotheque        ", font=("Arial", 20), fg_color=bgColor, justify="left", compound="left", anchor="w", bg_color=bgColor, image=logoImage)
-ThemeBtn = CTkButton(TitleFrame, text="", image=ThemeIcon, width=40, height=40, fg_color=mainColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), command=change_theme, border_width=1, border_color=("#e2e8f0","#27272a"))
-
-BtnFrame = CTkFrame(sideMenu, fg_color=bgColor, border_width=0)
-CTkLabel(BtnFrame, text="Menu", font=("Arial", 13, "bold"), bg_color=bgColor, justify="left", compound="left", anchor="w").pack(side=TOP, fill=X, padx=5, pady=0)
-dashboard = CTkButton(BtnFrame, text="  Accueil", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=dashboardIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Accueil") & updateMain("Accueil"))
-books = CTkButton(BtnFrame, text="  Livres", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=bookIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Livres") & updateMain("Livres"))
-clients = CTkButton(BtnFrame, text="  Adherents", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=clientsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Adherents") & updateMain("Adherents"))
-Loans = CTkButton(BtnFrame, text="  Emprunts", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Emprunts") & updateMain("Emprunts"))
-AddBook = CTkButton(BtnFrame, text="  Ajouter un livre", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=plusIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un livre") & updateMain("Ajouter un livre"))
-AddLoan = CTkButton(BtnFrame, text="  Ajouter un emprunt", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=loanIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un emprunt") & updateMain("Ajouter un emprunt"))
-AddClient = CTkButton(BtnFrame, text="  Ajouter un adherent", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=AddClientIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Ajouter un adherent") & updateMain("Ajouter un adherent"))
-settings = CTkButton(BtnFrame, text="  Paramètres", fg_color=bgColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), border_width=0, text_color=("#000", "#fff"), font=("Arial", 15), cursor="hand2", image=settingsIcon, compound="left", anchor="w", height=33, command=lambda: BtnColor("Paramètres") & updateMain("Paramètres"))
-
-Exit = CTkButton(BtnFrame, text="  Quitter", fg_color=bgColor, bg_color=bgColor, border_width=1, border_color="red", text_color=("red", "red"), font=("Arial", 15), cursor="hand2", image=exitIcon, compound="left", anchor="w", height=33, hover=False, command=lambda: app.destroy())
-
-
-#border
-border = CTkFrame(app, width=2, height=600, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a"), cursor="sb_left_arrow")
-border.bind("<Button-1>", lambda e: hideShowSideBar())
-
-#main----------------------------------------------------------------------
-main = CTkFrame(app, fg_color=mainColor, border_width=0)
-#-----Title
-MainFrame = CTkFrame(main, border_width=0, fg_color=mainColor)
-FrameTitle = CTkFrame(MainFrame, border_width=0, fg_color=mainColor)
-TitleMain = CTkLabel(FrameTitle, text="Dashboard", font=("Arial", 30), compound="left", anchor="w")
-expandBtn = CTkButton(FrameTitle, text="", image=expandIcon, width=40, height=40, fg_color=mainColor, bg_color=bgColor, hover_color=("#e2e8f0", "#27272a"), command=hideShowSideBar, border_width=1, border_color=("#e2e8f0","#27272a"))
-vBorder = CTkFrame(MainFrame, width=800, height=2, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a"))
-#-----Content
-mainContent = CTkFrame(main, border_width=0, fg_color=mainColor)
-
-#--------Dashboard------------------------------------------------------------------
-dashboardContent = CTkScrollableFrame(mainContent, border_width=0, fg_color=mainColor)
-dashboardContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-
-statsFrame = CTkFrame(dashboardContent, fg_color=mainColor)
-
-
-totalBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(totalBooksFrame, text="Total de livres", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
-CTkLabel(totalBooksFrame, text=TotalCopies, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(totalBooksFrame, text="+20% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a", "#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
-
-
-availableBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(availableBooksFrame, text="Livres disponibles", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
-CTkLabel(availableBooksFrame, text=TotalAvailableCopies, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(availableBooksFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
-
-
-borrowedBooksFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(borrowedBooksFrame, text="Livres empruntés", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
-CTkLabel(borrowedBooksFrame, text=borrowedBooks, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(borrowedBooksFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
-
-
-totalClientsFrame = CTkFrame(statsFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(totalClientsFrame, text="Total de clients", font=("Arial", 15, "bold"), justify="left", anchor="w", compound="left").pack(pady=(15,5), padx=15, anchor="w")
-CTkLabel(totalClientsFrame, text=totalClients, font=("Arial", 25)).pack(pady=(0,0), padx=15, anchor="w")
-CTkLabel(totalClientsFrame, text="+10% par rapport au mois précédent", font=("Arial", 10), justify="left", anchor="w", compound="left", text_color=("#27272a","#e3e8f0")).pack(pady=(0,3), padx=15, anchor="w")
-
-#Recent Activity
-recentFrame = CTkScrollableFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), label_text="Activité récente", label_font=("Arial", 20, "bold"), label_text_color=("#000", "#fff"), label_fg_color=("#fff", "#1e1e1e"), label_anchor="w")
-recentActivitiesFile = open("Database/recentActivities.txt", "r")
-recentActivities = recentActivitiesFile.readlines()
-recentActivities.reverse()
-class RecentActivity(CTkFrame):
-    def __init__(self, parent, text, font, **kwargs):
-        super().__init__(parent, **kwargs)
-        self.pack(side=TOP, fill=BOTH, expand=True, padx=5)
-        self.activity = CTkLabel(self, text=text, font=font)
-        self.activity.pack(side=LEFT, pady=5, padx=10, anchor="w", expand=False)
-        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-for activity in recentActivities:
-    if activity != "\n":
-        RecentActivity(recentFrame, text=f"{activity.strip("\n")}", font=("Arial", 15))
-recentActivitiesFile.close()
-
-
-
-#Top 5 Books
-class BookListItem(CTkFrame):
-    def __init__(self, parent, name, nbrEmprunt, auteur, **kwargs):
-        super().__init__(parent, **kwargs)
-        self.pack(side=TOP, fill=X, expand=False, padx=5, pady=1)
-        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-        self.rankCircle = CTkLabel(self, text=f"{i+1}", font=("Arial", 15, "bold"), fg_color=("#1e1e1e", "#fff"), corner_radius=100, width=40, height=40, text_color=("#fff", "#1e1e1e"))
-        self.rankCircle.pack(side=LEFT, padx=10, pady=10)
-        self.bookInfoFrame = CTkFrame(self, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-        self.bookInfoFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=0)
-        self.bookTitle = CTkLabel(self.bookInfoFrame, text=f"{name}", font=("Arial Bold", 15), justify="left", anchor="w")
-        self.bookTitle.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
-        self.bookAuthor = CTkLabel(self.bookInfoFrame, text=f"de {auteur}", font=("Arial", 15), justify="left", anchor="w", text_color=("#666666", "#b5b5b5"))
-        self.bookAuthor.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
-        self.NbrEmprunt = CTkLabel(self, text=f"   {nbrEmprunt}   ", font=("Arial", 15), justify="right", anchor="e", compound="left", image=loanIcon, text_color=("#666666", "#b5b5b5"))
-        self.NbrEmprunt.pack(side=RIGHT, fill=X, expand=True, padx=5, pady=0, anchor="e")
-class BookListItem2(CTkFrame):
-    def __init__(self, parent, name, nbrDisponible, auteur, **kwargs):
-        super().__init__(parent, **kwargs)
-        self.pack(side=TOP, fill=X, expand=False, padx=5, pady=2)
-        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-        self.bookInfoFrame = CTkFrame(self, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-        self.bookInfoFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=0)
-        self.bookTitle = CTkLabel(self.bookInfoFrame, text=f"{name}", font=("Arial Bold", 15), justify="left", anchor="w")
-        self.bookTitle.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
-        self.bookAuthor = CTkLabel(self.bookInfoFrame, text=f"de {auteur}", font=("Arial", 15), justify="left", anchor="w", text_color=("#666666", "#b5b5b5"))
-        self.bookAuthor.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=0, anchor="w")
-        self.NbrDisponible = CTkLabel(self, text=f"   {nbrDisponible}   ", font=("Arial", 15), justify="right", anchor="e", compound="left", image=stockIcon, text_color="red")
-        self.NbrDisponible.pack(side=RIGHT, fill=X, expand=True, padx=5, pady=0, anchor="e")
-
-
-
-
-
-
-
-top5BooksFrame = CTkFrame(dashboardContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(top5BooksFrame, text="Top 5 Livres", font=("Arial", 20, "bold")).pack(pady=(20,10), padx=20, anchor="w")
-for i in range(5) if len(top5Books) >= 5 else range(len(top5Books)):
-    book = top5Books[i]
-    BookListItem(top5BooksFrame, book.get_titre(), book.getNbrEmprunt(), str(f"{book.get_auteur().get_nom()} {book.get_auteur().get_prenomm()}"))
-
-
-bottomFrame = CTkFrame(dashboardContent, fg_color=mainColor, border_width=0, corner_radius=0, bg_color=mainColor)
-bottomFrame.pack(side=BOTTOM, fill=BOTH, expand=False, padx=(0,5))
-
-outOfStockFrame = CTkFrame(bottomFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-
-CTkLabel(outOfStockFrame, text="Livres non disponibles ou presque", font=("Arial", 20, "bold")).pack(pady=(20,10), padx=20, anchor="w")
-outOfStockBooks = gestion.get_livres_non_disponibles()
-for book in outOfStockBooks:
-    BookListItem2(outOfStockFrame, book.get_titre(), book.get_nbr_exemplaire_disponible(), str(f"{book.get_auteur().get_nom()} {book.get_auteur().get_prenomm()}"))
-
-#Chart
-chartFrame = CTkFrame(bottomFrame   , fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-CTitleFrame = CTkFrame(chartFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
-CTkLabel(CTitleFrame, text="Les emprunts", font=("Arial", 20, "bold")).pack(side=LEFT, pady=0, padx=0, anchor="w")
-
-chart = CTkFrame(chartFrame, fg_color=("#fff", "#1e1e1e"), bg_color=("#fff", "#1e1e1e"), border_width=0)
-chart.pack(side=BOTTOM, fill=BOTH, expand=True, padx=10, pady=10)
-
-controlFrame = CTkFrame(CTitleFrame, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0)
-controlFrame.pack(side=RIGHT, fill=Y, padx=0, pady=0)
-
-CTkLabel(controlFrame, text="Periode : ", font=("Arial", 15, "bold")).pack(side=LEFT, padx=5, pady=5)
-rangeSelector = CTkComboBox(controlFrame, values=["7", "14", "30"], width=80, command=lambda x: change_range(x))
-rangeSelector.set("7")
-rangeSelector.pack(side=RIGHT, padx=5, pady=5)
-
-def change_range(days):
-    try:
-        changeDayrange(chart, days, get_appearance_mode().lower(), "Database/Emprunts.txt")
-    except ValueError:
-        pass
-
-
-
-
-histogram = LoanChart(7, get_appearance_mode().lower(), "Database/Emprunts.txt")
-histogram.embed_in_tkinter(chart)
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Position
-statsFrame.pack(side=TOP, fill=X, pady=(0,10))
-totalBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-bottomFrame.pack(side=BOTTOM, fill=BOTH, expand=TRUE, pady=10)
-availableBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-borrowedBooksFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-totalClientsFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-recentFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-top5BooksFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
-outOfStockFrame.pack(side=LEFT, fill=BOTH, expand=False, padx=(0,5))
-chartFrame.pack(side=LEFT, fill=BOTH, expand=True, padx=(0,5))
-CTitleFrame.pack(side=TOP, fill=X, pady=(20,10), padx=20)
-
-
-
-
-#-----------------------------------------------------------------------------
-
-
-
-# -------Livres-------------------------------------------------------------------
-
-livresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-# -------Adherents-------------------------------------------------------------------
-adherentsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-adherentsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-# -------Emprunts-------------------------------------------------------------------
-empruntsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-empruntsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-searchFrame = CTkFrame(empruntsContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-searchInput = CTkEntry(searchFrame, placeholder_text='', fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
-
-
-class LoanItem(CTkFrame):
-    def __init__(self, parent, loan_data, return_callback, extend_callback, delete_callback, **kwargs):
-        super().__init__(parent, **kwargs)
-        self.loan_data = loan_data
-
-        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1,
-                       border_color=("#e2e8f0", "#1e1e1e"))
-
-        book_info = f"{loan_data['livreEmprunte']['titre']} - {loan_data['livreEmprunte']['auteur']['nom']} {loan_data['livreEmprunte']['auteur']['prenom']}"
-        borrower_info = f"{loan_data['EmprunteurLivre']['nom']} {loan_data['EmprunteurLivre']['prenom']}"
-        due_date = loan_data['dateRetourPrevue']
-
-        CTkLabel(self, text=book_info, font=("Arial", 15, "bold")).pack(side=LEFT, padx=10)
-        CTkLabel(self, text=borrower_info, font=("Arial", 15)).pack(side=LEFT, padx=10)
-        CTkLabel(self, text=f"Due: {due_date}", font=("Arial", 15)).pack(side=LEFT, padx=10)
-
-        return_btn = CTkButton(self, text="Return", command=lambda: return_callback(loan_data))
-        return_btn.pack(side=RIGHT, padx=5)
-
-        extend_btn = CTkButton(self, text="Extend", command=lambda: extend_callback(loan_data))
-        extend_btn.pack(side=RIGHT, padx=5)
-
-        delete_btn = CTkButton(self, text="Delete", fg_color="red", command=lambda: delete_callback(loan_data))
-        delete_btn.pack(side=RIGHT, padx=5)
-
-
-class EmpruntsFrame(CTkFrame):
+gestion.getDefault()
+Adherents = gestion.get_all_clients().values()
+
+
+
+#images
+editIcon = CTkImage(PIL.Image.open("images/edit.png"), size=(20, 20))
+deletIcon = CTkImage(PIL.Image.open("images/delet.png"), size=(20, 20))
+# class Adherent:
+#     code = 1
+#     try:
+#         with open("Database/adherent.json", "r") as file:
+#             adherents_data = json.load(file)
+#             if adherents_data:
+#                 code = adherents_data[-1]["code"] + 1
+#     except (FileNotFoundError, json.JSONDecodeError):
+#         pass
+
+#     def __init__(self, nom, prenom, dateAdhesion, **kwargs):
+#         if not isinstance(dateAdhesion, date) or dateAdhesion > date.today():
+#             raise Exception("Date inscription invalide")
+#         else:
+#             if "code" in kwargs:
+#                 self.__code = kwargs["code"]
+#             else:
+#                 self.__code = Adherent.code
+#                 Adherent.code += 1
+#             self.__nom = nom
+#             self.__prenom = prenom
+#             self.__DateAdhésion = dateAdhesion
+
+#     def getCode(self):
+#         return self.__code
+    
+#     def getDateAdhesion(self):
+#         return self.__DateAdhésion
+
+#     def getNom(self):
+#         return self.__nom
+    
+#     def getPrenom(self):
+#         return self.__prenom
+
+#     def to_dict(self):
+#         return {"nom": self.getNom(), "prenom": self.getPrenom(), "dateAdhesion": self.__DateAdhésion.strftime('%Y-%m-%d'), "code": self.__code}
+
+#     @classmethod
+#     def from_dict(cls, data):
+#         return cls(data["nom"], data["prenom"], date.fromisoformat(data["dateAdhesion"]), code=data["code"])
+
+#     def __str__(self):
+#         return f"{self.getNom()} {self.getPrenom()}, Code: {self.getCode()}, Date d'adhésion: {self.getDateAdhesion().day}/{self.getDateAdhesion().month}/{self.getDateAdhesion().year}"
+
+#     def fidelite(self):
+#         """Retourne la fidélité de l'adhérent (ex. nombre d'années d'adhésion)."""
+#         return (date.today() - self.getDateAdhesion()).days // 365
+
+
+class Application:
+    def __init__(self, root):
+        self.root = root
+        
+        self.nav_frame = CTkFrame(self.root)
+        self.nav_frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        
+        self.bouton_adherents = CTkButton(self.nav_frame, text="Adhérents", command=self.afficher_page_adherents)
+        self.bouton_adherents.grid(row=0, column=0, padx=10, pady=5)
+
+        self.bouton_ajouter = CTkButton(self.nav_frame, text="Ajouter un Adhérent", command=self.afficher_page_ajouter)
+        self.bouton_ajouter.grid(row=0, column=1, padx=10, pady=5)
+
+        self.page_adherents = CTkFrame(self.root)
+        self.page_ajouter = CTkFrame(self.root)
+
+        self.liste_adherents_label = CTkLabel(self.page_adherents, text="Liste des adhérents", font=("Arial", 16))
+        self.liste_adherents_label.grid(row=0, column=0, padx=20, pady=20)
+
+        self.chercher_label = CTkLabel(self.page_adherents, text="Chercher par code ou nom:")
+        self.chercher_label.grid(row=1, column=0, padx=10, pady=5)
+        
+        self.chercher_entry = CTkEntry(self.page_adherents)
+        self.chercher_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.chercher_button = CTkButton(self.page_adherents, text="Chercher", command=self.chercher_adhérent)
+        self.chercher_button.grid(row=1, column=2, padx=10, pady=5)
+
+        self.revenir_button = CTkButton(self.page_adherents, text="Revenir à la liste", command=self.revenir_a_la_liste)
+        self.revenir_button.grid(row=5, column=3, padx=10, pady=5)
+
+        self.treeview = ttk.Treeview(self.page_adherents, columns=("Code", "Nom", "Prénom", "Date d'adhésion"), show="headings")
+        self.treeview.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
+
+        self.treeview.heading("Code", text="Code")
+        self.treeview.heading("Nom", text="Nom")
+        self.treeview.heading("Prénom", text="Prénom")
+        self.treeview.heading("Date d'adhésion", text="Date d'adhésion")
+
+        self.treeview.column("Code", width=100)
+        self.treeview.column("Nom", width=150)
+        self.treeview.column("Prénom", width=150)
+        self.treeview.column("Date d'adhésion", width=150)
+
+        self.vider_button = CTkButton(self.page_adherents, text="Vider la liste", command=self.vider_liste_adhérent)
+        self.vider_button.grid(row=4, column=0,  pady=10)
+
+        self.supprimer_button = CTkButton(self.page_adherents, text="Supprimer un adhérent", command=self.supprimer_adhérent)
+        self.supprimer_button.grid(row=4, column=1, pady=10)
+
+        self.modifier_button = CTkButton(self.page_adherents, text="Modifier un Adhérent", command=self.modifier_adherent)
+        self.modifier_button.grid(row=4, column=2, pady=10)
+
+        self.nom_label = CTkLabel(self.page_ajouter, text="Nom:")
+        self.nom_label.grid(row=0, column=0, padx=10, pady=5)
+
+        self.nom_entry = CTkEntry(self.page_ajouter)
+        self.nom_entry.grid(row=0, column=1, padx=10, pady=5)
+
+        self.prenom_label = CTkLabel(self.page_ajouter, text="Prénom:")
+        self.prenom_label.grid(row=1, column=0, padx=10, pady=5)
+
+        self.prenom_entry = CTkEntry(self.page_ajouter)
+        self.prenom_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.date_adhesion_label = CTkLabel(self.page_ajouter, text="Date d'adhésion (YYYY-MM-DD):")
+        self.date_adhesion_label.grid(row=2, column=0, padx=10, pady=5)
+
+        self.date_adhesion_entry = CTkEntry(self.page_ajouter)
+        self.date_adhesion_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        self.ajouter_button = CTkButton(self.page_ajouter, text="Ajouter", command=self.ajouter_adherent)
+        self.ajouter_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+        self.retour_button = CTkButton(self.page_ajouter, text="Retour à Adhérents", command=self.afficher_page_adherents)
+        self.retour_button.grid(row=4, column=0, columnspan=2, pady=10)
+
+        self.treeview_ajouter = ttk.Treeview(self.page_ajouter, columns=("Code", "Nom", "Prénom", "Date d'adhésion"), show="headings")
+        self.treeview_ajouter.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
+
+        self.treeview_ajouter.heading("Code", text="Code")
+        self.treeview_ajouter.heading("Nom", text="Nom")
+        self.treeview_ajouter.heading("Prénom", text="Prénom")
+        self.treeview_ajouter.heading("Date d'adhésion", text="Date d'adhésion")
+
+        self.treeview_ajouter.column("Code", width=100)
+        self.treeview_ajouter.column("Nom", width=150)
+        self.treeview_ajouter.column("Prénom", width=150)
+        self.treeview_ajouter.column("Date d'adhésion", width=150)
+
+        self.afficher_adherents()
+
+    def afficher_page_adherents(self):
+        self.page_ajouter.grid_forget()  
+        self.page_adherents.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")  
+        self.vider_liste_adhérent()  
+        self.afficher_adherents()  
+
+    def afficher_page_ajouter(self):
+        self.page_adherents.grid_forget()  
+        self.page_ajouter.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")  
+
+    def afficher_adherents(self):
+        self.vider_liste_adhérent()  
+        self.vider_liste_ajouter()   
+        try:
+            with open("Database/adherent.json", "r") as file:
+                adherents_data = json.load(file)
+                for adherent_data in adherents_data:
+                    adherent = Adherent.from_dict(adherent_data)
+                    self.treeview.insert("", "end", values=(adherent.getCode(), adherent.getNom(), adherent.getPrenom(), adherent.getDateAdhesion()))
+                    self.treeview_ajouter.insert("", "end", values=(adherent.getCode(), adherent.getNom(), adherent.getPrenom(), adherent.getDateAdhesion()))
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+
+
+    def chercher_adhérent(self):
+        code_ou_nom = self.chercher_entry.get().strip()  
+        self.vider_liste_adhérent()  
+
+        if not code_ou_nom: 
+            return
+        
+        try:
+            with open("Database/adherent.json", "r") as file:
+                adherents_data = json.load(file)
+                found = False  
+                for adherent_data in adherents_data:
+                    
+                    if (str(adherent_data["code"]) == code_ou_nom) or (code_ou_nom.lower() in adherent_data["nom"].lower()) or (code_ou_nom.lower() in adherent_data["prenom"].lower()):
+                        adherent = Adherent.from_dict(adherent_data)
+                        self.treeview.insert("", "end", values=(adherent.getCode(), adherent.getNom(), adherent.getPrenom(), adherent.getDateAdhesion()))
+                        found = True
+
+                if not found:
+                    messagebox.showinfo("Aucun résultat", "Aucun adhérent trouvé correspondant à votre recherche.")
+        except (FileNotFoundError, json.JSONDecodeError):
+            messagebox.showerror("Erreur", "Le fichier des adhérents est introuvable ou endommagé.")
+        
+        self.chercher_entry.delete(0, END)
+
+
+    def vider_liste_adhérent(self):
+        for item in self.treeview.get_children():
+            self.treeview.delete(item)
+
+    def vider_liste_ajouter(self):
+        for item in self.treeview_ajouter.get_children():
+            self.treeview_ajouter.delete(item)
+
+
+    def revenir_a_la_liste(self):
+        self.afficher_page_adherents()
+        
+    def supprimer_adhérent(self):
+        selected_item = self.treeview.selection()
+        if not selected_item:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un adhérent à supprimer.")
+            return
+
+        result = messagebox.askyesno("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer cet adhérent ?")
+        if result:
+            item = self.treeview.item(selected_item)
+            code_to_delete = item['values'][0]
+
+            try:
+                with open("Database/adherent.json", "r") as file:
+                    adherents_data = json.load(file)
+            except (FileNotFoundError, json.JSONDecodeError):
+                adherents_data = []
+
+            adherents_data = [adherent for adherent in adherents_data if adherent["code"] != code_to_delete]
+
+            with open("Database/adherent.json", "w") as file:
+                json.dump(adherents_data, file, indent=4)
+
+            self.afficher_adherents() 
+
+    def ajouter_adherent(self):
+        nom = self.nom_entry.get()
+        prenom = self.prenom_entry.get()
+        date_adhesion_str = self.date_adhesion_entry.get()
+
+        try:
+            date_adhesion = date.fromisoformat(date_adhesion_str)
+        except ValueError:
+            messagebox.showerror("Erreur", "Format de date invalide. Utilisez le format YYYY-MM-DD.")
+            return
+
+        adherent = Adherent(nom, prenom, date_adhesion)
+
+        try:
+            with open("Database/adherent.json", "r") as file:
+                adherents_data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            adherents_data = []  
+
+        adherents_data.append(adherent.to_dict())
+
+        try:
+            with open("Database/adherent.json", "w") as file:
+                json.dump(adherents_data, file, indent=4)
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la sauvegarde : {e}")
+            return
+
+        self.afficher_adherents()
+
+        self.afficher_page_adherents()
+        messagebox.showinfo("Succès", "Adhérent ajouté avec succès.")
+
+
+    def modifier_adherent(self):
+        selected_item = self.treeview.selection()
+        if not selected_item:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un adhérent à modifier.")
+            return
+
+        item = self.treeview.item(selected_item)
+        code = item['values'][0]
+        nom = item['values'][1]
+        prenom = item['values'][2]
+        date_adhesion = item['values'][3]
+
+        self.modifier_window = CTkToplevel(self.root)
+        self.modifier_window.title("Modifier un Adhérent")
+
+        self.nom_label = CTkLabel(self.modifier_window, text="Nom:")
+        self.nom_label.grid(row=0, column=0, padx=10, pady=5)
+        self.nom_entry = CTkEntry(self.modifier_window)
+        self.nom_entry.insert(0, nom)
+        self.nom_entry.grid(row=0, column=1, padx=10, pady=5)
+
+        self.prenom_label = CTkLabel(self.modifier_window, text="Prénom:")
+        self.prenom_label.grid(row=1, column=0, padx=10, pady=5)
+        self.prenom_entry = CTkEntry(self.modifier_window)
+        self.prenom_entry.insert(0, prenom)
+        self.prenom_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.date_adhesion_label = CTkLabel(self.modifier_window, text="Date d'adhésion:")
+        self.date_adhesion_label.grid(row=2, column=0, padx=10, pady=5)
+        self.date_adhesion_entry = CTkEntry(self.modifier_window)
+        self.date_adhesion_entry.insert(0, date_adhesion)
+        self.date_adhesion_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        self.sauvegarder_button = CTkButton(self.modifier_window, text="Sauvegarder", command=lambda: self.sauvegarder_modifications(code))
+        self.sauvegarder_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+    def sauvegarder_modifications(self, code):
+        nom = self.nom_entry.get()
+        prenom = self.prenom_entry.get()
+        date_adhesion_str = self.date_adhesion_entry.get()
+
+        try:
+            date_adhesion = date.fromisoformat(date_adhesion_str)
+        except ValueError:
+            messagebox.showerror("Erreur", "Format de date invalide. Utilisez le format YYYY-MM-DD.")
+            return
+
+        try:
+            with open("Database/adherent.json", "r") as file:
+                adherents_data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            adherents_data = []
+
+        for adherent in adherents_data:
+            if adherent["code"] == code:
+                adherent["nom"] = nom
+                adherent["prenom"] = prenom
+                adherent["dateAdhesion"] = date_adhesion.strftime('%Y-%m-%d')
+                break
+
+        with open("Database/adherent.json", "w") as file:
+            json.dump(adherents_data, file, indent=4)
+
+        self.afficher_adherents()
+        self.modifier_window.destroy()
+        messagebox.showinfo("Succès", "Les informations de l'adhérent ont été mises à jour.")
+
+
+class AdhrentsList(CTkFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
-        self.configure(fg_color=("#fff", "#1e1e1e"))
+        self.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        Adherents = gestion.get_all_clients().values()
+        # Header
+        CTkLabel(self, text='Code', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=0)
+        CTkLabel(self, text='Nom', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=1)
+        CTkLabel(self, text='Prenom', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=2)
+        CTkLabel(self, text='Date d\'adhésion', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=3)
+        CTkLabel(self, text='Action', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=4)
+        CTkFrame(self, height=2, width=1700, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a")).grid(row=1, column=0, columnspan=5)
+        
+        self.row = 2
+        self.afficher_adherents(Adherents)
+        self.columnconfigure((0, 1, 2, 3, 4), weight=1)
 
-        self.loans_list = []
-        self.load_loans()
+    def afficher_adherents(self, adhrs):
+        Adherents = gestion.get_all_clients().values()
+        for widget in self.grid_slaves():
+            if int(widget.grid_info()["row"]) > 1:
+                widget.grid_forget()
+        
+        for elt in adhrs:
+            col = 0
+            for SudoElt in [elt.getCode(), elt.get_nom(), elt.get_prenomm(), str(elt.getDateDateAdhésion())]:
+                label = CTkLabel(self, text=str(SudoElt), justify="center", corner_radius=50, fg_color='transparent', pady=10)
+                label.grid(row=self.row, column=col)
+                col += 1
+            ButtonsFrame = CTkFrame(self, fg_color='transparent')
+            ButtonsFrame.grid(row=self.row, column=4)
+            Modifier = CTkLabel(ButtonsFrame, text='', justify="center", compound='center', anchor='center', cursor='hand2', image=editIcon)
+            Modifier.pack(side=LEFT, padx=5)
+            Supp = CTkLabel(ButtonsFrame, text='', justify="center", compound='center', anchor='center', cursor='hand2', image=deletIcon)
+            Supp.pack(side=RIGHT, padx=5)
+            Modifier.bind("<Button-1>", lambda e, code=elt.getCode(): self.modifier_adherent(code))
+            Supp.bind("<Button-1>", lambda e, code=elt.getCode(): self.supprimer_adhérent(code))
+            self.row += 1
 
-        self.list_frame = CTkScrollableFrame(self, fg_color=("#fff", "#1e1e1e"))
-        self.list_frame.pack(fill=BOTH, expand=True, padx=10, pady=10)
+    def search_adherent(self, search_term):
+        Adherents = gestion.get_all_clients().values()
+        filtered_emprunts = [elt for elt in Adherents if search_term.lower() in str(elt.getCode()).lower() or search_term.lower() in str(elt.get_nom()).lower() or search_term.lower() in str(elt.get_prenomm()).lower()]
+        self.row = 2
+        self.afficher_adherents(filtered_emprunts)
+    def modifier_adherent(self, code):
+        Adherents = gestion.get_all_clients().values()
+        adherents_list = gestion.get_all_clients()
+        Adrnt = adherents_list[code]
+        nom = Adrnt.get_nom()
+        prenom = Adrnt.get_prenomm()
+        date_adhesion = Adrnt.getDateDateAdhésion()
 
-        self.display_loans()
+        self.modifier_window = CTkToplevel(self)
+        self.modifier_window.title("Modifier un Adhérent")
 
-    def load_loans(self):
+        self.nom_label = CTkLabel(self.modifier_window, text="Nom:")
+        self.nom_label.grid(row=0, column=0, padx=10, pady=5)
+        self.nom_entry = CTkEntry(self.modifier_window)
+        self.nom_entry.insert(0, nom)
+        self.nom_entry.grid(row=0, column=1, padx=10, pady=5)
+
+        self.prenom_label = CTkLabel(self.modifier_window, text="Prénom:")
+        self.prenom_label.grid(row=1, column=0, padx=10, pady=5)
+        self.prenom_entry = CTkEntry(self.modifier_window)
+        self.prenom_entry.insert(0, prenom)
+        self.prenom_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.date_adhesion_label = CTkLabel(self.modifier_window, text="Date d'adhésion:")
+        self.date_adhesion_label.grid(row=2, column=0, padx=10, pady=5)
+        self.date_adhesion_entry = CTkEntry(self.modifier_window)
+        self.date_adhesion_entry.insert(0, date_adhesion)
+        self.date_adhesion_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        self.sauvegarder_button = CTkButton(self.modifier_window, text="Sauvegarder", command=lambda : self.Enrg(code))
+        self.sauvegarder_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+        
+    def Enrg(self, code):
+        Adherents = gestion.get_all_clients().values()
+        nom = self.nom_entry.get()
+        prenom = self.prenom_entry.get()
+        date_adhesion_str = self.date_adhesion_entry.get()
+
         try:
-            with open("Database/Emprunts.txt", "r") as file:
-                self.loans_list = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.loans_list = []
-
-    def save_loans(self):
-        with open("Database/Emprunts.txt", "w") as file:
-            json.dump(self.loans_list, file, indent=4)
-
-    def display_loans(self):
-        for widget in self.list_frame.winfo_children():
-            widget.destroy()
-
-        for loan in self.loans_list:
-            LoanItem(self.list_frame, loan, self.return_book, self.extend_loan, self.delete_loan).pack(fill=X, padx=10,
-                                                                                                       pady=5)
-
-    def return_book(self, loan):
-        self.loans_list.remove(loan)
-        self.save_loans()
-        self.display_loans()
-
-    def extend_loan(self, loan):
-        loan['dateRetourPrevue'] = "Extended Date"  # Placeholder for actual logic
-        self.save_loans()
-        self.display_loans()
-
-    def delete_loan(self, loan):
-        self.loans_list.remove(loan)
-        self.save_loans()
-        self.display_loans()
-empruntsZ = EmpruntsFrame(empruntsContent)
-empruntsZ.pack(fill=BOTH, expand=True)
-#Position
-searchFrame.pack(side=TOP, fill=X, pady=0, padx=0)
-searchInput.pack(side=LEFT, fill=X, expand=True, padx=10, pady=10)
-
-#-------Ajouter un livre-------------------------------------------------------------------
-ajouterLivreContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-#-------Ajouter un emprunt-------------------------------------------------------------------
-ajouterEmpruntContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-ajouterEmpruntContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-#-------Ajouter un adherent-------------------------------------------------------------------
-ajouterAdherentContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-ajouterAdherentContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-#-------Paramètres-------------------------------------------------------------------
-parametresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-parametresTitle = CTkLabel(parametresContent, text="Paramètres", font=("Hubot Sans", 24, "bold"), text_color=("#03045E", "#FFFFFF"))
-parametresTitle.pack(side=TOP, pady=(10, 20), padx=20, anchor="w")
-
-themeFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
-themeFrame.pack(side=TOP, fill=X, padx=20, pady=10)
-
-themeLabel = CTkLabel(themeFrame, text="Thème", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
-themeLabel.pack(side=TOP, anchor="w", pady=(0, 10))
-
-themeVar = StringVar(value="Dark" if get_appearance_mode() == "Dark" else "Light")
-
-def update_theme():
-    theme = themeVar.get()
-    set_appearance_mode(theme.lower())
-    update_menu_colors()
-
-CTkRadioButton(themeFrame, text="Mode Sombre", variable=themeVar, value="Dark", font=("Roboto", 14), command=update_theme).pack(side=TOP, anchor="w", pady=5)
-CTkRadioButton(themeFrame, text="Mode Clair", variable=themeVar, value="Light", font=("Roboto", 14), command=update_theme).pack(side=TOP, anchor="w", pady=5)
-
-languageFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
-languageFrame.pack(side=TOP, fill=X, padx=20, pady=10)
-
-languageLabel = CTkLabel(languageFrame, text="Langue", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
-languageLabel.pack(side=TOP, anchor="w", pady=(0, 10))
-
-languageVar = StringVar(value="Français")
-
-def update_language():
-    language = languageVar.get()
-    messagebox.showinfo("Langue", f"Langue sélectionnée : {language}")
-
-CTkRadioButton(languageFrame, text="Français", variable=languageVar, value="Français", font=("Roboto", 14), command=update_language).pack(side=TOP, anchor="w", pady=5)
-CTkRadioButton(languageFrame, text="English", variable=languageVar, value="English", font=("Roboto", 14), command=update_language).pack(side=TOP, anchor="w", pady=5)
-
-accountFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
-accountFrame.pack(side=TOP, fill=X, padx=20, pady=10)
-
-accountLabel = CTkLabel(accountFrame, text="Paramètres du Compte", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
-accountLabel.pack(side=TOP, anchor="w", pady=(0, 10))
-
-usernameLabel = CTkLabel(accountFrame, text="Nom d'utilisateur", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
-usernameLabel.pack(side=TOP, anchor="w", pady=(0, 5))
-
-usernameEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre nom d'utilisateur", width=300)
-usernameEntry.pack(side=TOP, anchor="w", pady=(0, 10))
-
-passwordLabel = CTkLabel(accountFrame, text="Mot de passe", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
-passwordLabel.pack(side=TOP, anchor="w", pady=(0, 5))
-
-passwordEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre mot de passe", show="*", width=300)
-passwordEntry.pack(side=TOP, anchor="w", pady=(0, 10))
-
-def save_account_settings():
-    username = usernameEntry.get()
-    password = passwordEntry.get()
-    if username and password:
-        messagebox.showinfo("Succès", "Paramètres du compte mis à jour avec succès!")
-    else:
-        messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
-
-saveButton = CTkButton(accountFrame, text="Enregistrer", font=("Roboto", 14), fg_color="#00B4D8", hover_color="#90E0FF", command=save_account_settings)
-saveButton.pack(side=TOP, anchor="w", pady=(10, 0))
-
-parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Position----------------------------------------------------------------------
-sideMenu.pack(side=LEFT, fill=Y)
-TitleFrame.pack(side=TOP, fill=X, padx=5)
-sideTitle.pack(side=LEFT, pady=30, padx=5)
-ThemeBtn.pack(side=RIGHT)
-BtnFrame.pack(side=TOP, fill=BOTH,expand=YES, padx=5, pady=0)
-dashboard.pack(side=TOP, fill=X, padx=5, pady=5)
-books.pack(side=TOP, fill=X, padx=5, pady=5)
-clients.pack(side=TOP, fill=X, padx=5, pady=5)
-Loans.pack(side=TOP, fill=X, padx=5, pady=5)
-AddBook.pack(side=TOP, fill=X, padx=5, pady=5)
-AddLoan.pack(side=TOP, fill=X, padx=5, pady=5)
-AddClient.pack(side=TOP, fill=X, padx=5, pady=5)
-settings.pack(side=TOP, fill=X, padx=5, pady=5)
-Exit.pack(side=BOTTOM, fill=X, padx=5, pady=5)
-border.pack(side=LEFT, fill=Y)
-
-
-
-main.pack(side=LEFT, fill=BOTH, expand=YES)
-MainFrame.pack(side=TOP, fill=X)
-FrameTitle.pack(side=TOP, fill=X, padx=0, pady=0)
-expandBtn.pack(side=LEFT, fill=X, padx=(15,5), pady=15)
-TitleMain.pack(side=LEFT, fill=X, padx=5, pady=15)
-vBorder.pack(side=TOP, fill=X)
-mainContent.pack(side=TOP, fill=BOTH, expand=True, padx=10, pady=10)
-
-
-
-
-
-
-#Menu------------------------------------------------------
-menubar = Menu(app)
-file = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Fichier', menu=file)
-file.add_command(label='Enregistrer les livres csv', command=lambda: gestion.save_livres_csv() & messagebox.showinfo("Enregistrement", "Les livres ont ete enregistres avec succes"))
-file.add_command(label='Enregistrer les emprunts csv', command=lambda: gestion.save_emprunts_csv() & messagebox.showinfo("Enregistrement", "Les emprunts ont ete enregistres avec succes"))
-file.add_command(label='Enregistrer les adherents csv', command=lambda: gestion.save_adherents_csv() & messagebox.showinfo("Enregistrement", "Les adherents ont ete enregistres avec succes"))
-file.add_separator()
-file.add_command(label='Quitter', command=app.destroy)
-
-edit = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Editer', menu=edit)
-edit.add_command(label='Couper', command=None)
-edit.add_command(label='Copier', command=None)
-edit.add_command(label='Coller', command=None)
-edit.add_command(label='Selectionner tout', command=None)
-edit.add_separator()
-edit.add_command(label='Find...', command=None)
-
-view = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Voir', menu=view)
-sideBarView = IntVar()
-view.add_checkbutton(label="Barre latérale", command=hideShowSideBar, variable=sideBarView)
-mode = Menu(view, tearoff=0)
-Modevr = StringVar()
-mode.add_radiobutton(label="Dark mode", variable=Modevr, value="Dark mode", command=lambda: set_appearance_mode("dark") & update_menu_colors())
-mode.add_radiobutton(label="Light mode", variable=Modevr, value="Light mode", command=lambda: set_appearance_mode("light") & update_menu_colors())
-Modevr.set("Light mode")
-zoom = Menu(view, tearoff=0)
-ZoomInt = IntVar()
-zoom.add_radiobutton(label="60%", variable=ZoomInt, value=0.6, command=lambda: set_widget_scaling(0.6))
-zoom.add_radiobutton(label="80%", variable=ZoomInt, value=0.8, command=lambda: set_widget_scaling(0.8))
-zoom.add_radiobutton(label="100%", variable=ZoomInt, value=1, command=lambda: set_widget_scaling(1))
-zoom.add_radiobutton(label="120%", variable=ZoomInt, value=1.2, command=lambda: set_widget_scaling(1.2))
-zoom.add_radiobutton(label="150%", variable=ZoomInt, value=1.5, command=lambda: set_widget_scaling(1.5))
-ZoomInt.set(1)
-view.add_cascade(label="Thème", menu=mode)
-view.add_cascade(label="Zoom", menu=zoom)
-sideBarView.set(1)
-
-help_ = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Aide', menu=help_)
-help_.add_command(label='Aide', command=None)
-
-app.config(menu=menubar)
-
-update_menu_colors()
-
-
-
-
-
-
-
-app.config(menu = menubar)
-
-BtnColor("Accueil")
-updateMain("Accueil")
-defaultSettings()
-
-def mainloop():
-    app.mainloop()
-if __name__ == "__main__":
-    mainloop()
+            date_adhesion = date.fromisoformat(date_adhesion_str)
+        except ValueError:
+            messagebox.showerror("Erreur", "Format de date invalide. Utilisez le format YYYY-MM-DD.")
+            return
+        if messagebox.askyesno('Modifier d\'un Adherent', f'Êtes-vous sûr de vouloir modifier cet adhérent N° {code} ?'):
+            try:
+                gestion.modifierAdherent(code, nom, prenom, date_adhesion)
+                self.afficher_adherents(Adherents)
+                self.modifier_window.destroy()
+                messagebox.showinfo('Succes', 'Les informations de l\'adhérent ont été mises à jour.')
+            except Exception as e:
+                messagebox.showerror('Erreur', str(e))
+                print(e)
+
+
+    def supprimer_adhérent(self, code):
+        Adherents = gestion.get_all_clients().values()
+        if messagebox.askyesno('Supprimer d\'un Adherent', f'Êtes-vous sûr de vouloir supprimer cet adhérent N° {code} ?'):
+            try:
+                gestion.supprimerAdherent(code)
+                self.afficher_adherents(Adherents)
+                messagebox.showinfo('Succes', 'Adherent supprime avec succes')
+            except Exception as e:
+                messagebox.showerror('Erreur', str(e))
+                print(e)
+class AjouterAdhr(CTkFrame):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.pack(expand=True, pady=10, padx=20)
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+        
+        label_title = CTkLabel(self , text="Ajouter un Adherent", font=("Arial", 20, "bold"))
+        label_title.grid(row=0, column=0, columnspan=2, pady=10)
+        self.nom_label = CTkLabel(self, text="Nom:")
+        self.nom_label.grid(row=1, column=0, padx=10, pady=5)
+
+        self.nom_entry = CTkEntry(self)
+        self.nom_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.prenom_label = CTkLabel(self, text="Prénom:")
+        self.prenom_label.grid(row=2, column=0, padx=10, pady=5)
+
+        self.prenom_entry = CTkEntry(self)
+        self.prenom_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        self.date_adhesion_label = CTkLabel(self, text="Date d'adhésion (YYYY-MM-DD):")
+        self.date_adhesion_label.grid(row=3, column=0, padx=10, pady=5)
+
+        self.date_adhesion_entry = DateEntry(self, date_pattern='yyyy-mm-dd', height=10)
+        self.date_adhesion_entry.grid(row=3, column=1, padx=10, pady=5)
+
+        self.ajouter_button = CTkButton(self, text="Ajouter", fg_color=("#0078D7", "#005A9E"), text_color="#fff",
+                            hover_color=("#005A9E", "#004680"), corner_radius=8, command=self.Ajouter)
+        self.ajouter_button.grid(row=4, column=0, columnspan=2, pady=10)
+
+    def Ajouter(self):
+        nom = self.nom_entry.get()
+        prenom = self.prenom_entry.get()
+        date_adhesion_str = self.date_adhesion_entry.get_date()
+        if len(nom) == 0 or len(prenom) == 0:
+            messagebox.showerror("Erreur", 'Veuillez remplir tous les champs!')
+            return
+
+        try:
+            gestion.ajouterAdherent(nom, prenom, date_adhesion_str)
+            messagebox.showinfo('Succes', 'Adherent a ete ajoute avec succes')
+        except Exception as e:
+            messagebox.showerror("Erreur", str(e))
+            return
+        
+
+
+
+# app = CTk()
+# Adh = AjouterAdhr(app)
+# app.mainloop()

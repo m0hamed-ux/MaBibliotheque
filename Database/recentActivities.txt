@@ -54,3 +54,21 @@ Le livre Test2 a ete ajoute le 15/02/2025
 L'adherent 1 a emprunte le livre L0000 le 15/02/2025
 L'adherent 1 a emprunte le livre L0000 le 15/02/2025
 L'adherent 1 a emprunte le livre L0000 le 15/02/2025
+L'adherent ali Ahmed a ete supprime le 17/02/2025
+L'adherent Allali Ali a ete supprime le 17/02/2025
+L'adherent kadiri Ali a ete modifie le 17/02/2025
+L'adherent Allali Ahmed a ete ajoute le 01/01/2025
+L'adherent Test Test a ete ajoute le 05/02/2025
+L'adherent Teeest Teest a ete ajoute le 04/02/2025
+L'adherent AAA BBBB a ete ajoute le 01/02/2025
+L'adherent Teeest Teest a ete supprime le 17/02/2025
+L'adherent AAA BBBB a ete supprime le 17/02/2025
+L'adherent TTest PPPO a ete ajoute le 17/02/2025
+L'adherent aaa bbb a ete ajoute le 17/02/2025
+L'adherent BBBB CCCC a ete ajoute le 17/02/2025
+L'adherent aaa bbb a ete supprime le 17/02/2025
+L'adherent PPP DDD a ete ajoute le 17/02/2025
+L'adherent PPP DDD a ete supprime le 17/02/2025
+L'adherent BBBB CCCC a ete supprime le 17/02/2025
+L'adherent TTest PPPO a ete supprime le 17/02/2025
+L'adherent test Ali a ete modifie le 17/02/2025

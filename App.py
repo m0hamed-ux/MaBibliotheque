@@ -16,14 +16,17 @@ from livre import *
 from tkinter import TOP, X
 import shutil
 import os
+# from test import AdhrentsList
 
 
 
 #Gestion
 gestion = Biblio()
 gestion.load_data()
+gestion.getDefault()
 totalBooks = len(gestion.get_livres())
 Emprnts = gestion.get_all_emprunts()
+Adherents = gestion.get_all_clients().values()
 TotalCopies = gestion.getTotalCopies()
 availableBooks = len(gestion.get_available_books())
 TotalAvailableCopies = gestion.getTotalAvailableCopies()
@@ -433,6 +436,143 @@ livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 # -------Adherents-------------------------------------------------------------------
 adherentsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 adherentsContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+searchFrameAdh = CTkFrame(adherentsContent, fg_color='transparent', corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+searchInputAdh = CTkEntry(searchFrameAdh, placeholder_text='Chercher par code, nom ou prenom...', fg_color=("#fff", "#1e1e1e"), corner_radius=7, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), height=35)
+AddAdhr = CTkButton(searchFrameAdh, text='Ajouter', fg_color=('#000', '#1e1e1e'), corner_radius=7, border_width=0, border_color=("#e2e8f0", "#1e1e1e"), height=35, text_color="#fff",hover_color=('#515153','#515153'), compound='left', anchor='center', image=plusIconLight, cursor='hand2', command=lambda: BtnColor("Ajouter un emprunt") & updateMain("Ajouter un emprunt"))
+
+AdhrFrame = CTkScrollableFrame(adherentsContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+
+
+editIcon = CTkImage(PIL.Image.open("images/edit.png"), size=(20, 20))
+deletIcon = CTkImage(PIL.Image.open("images/delet.png"), size=(20, 20))
+
+class AdhrentsList(CTkFrame):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        Adherents = gestion.get_all_clients().values()
+        # Header
+        CTkLabel(self, text='Code', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=0)
+        CTkLabel(self, text='Nom', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=1)
+        CTkLabel(self, text='Prenom', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=2)
+        CTkLabel(self, text='Date d\'adhésion', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=3)
+        CTkLabel(self, text='Action', font=('Arial bold', 12), compound='center', justify='center', pady=6).grid(row=0, column=4)
+        CTkFrame(self, height=2, width=1700, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a")).grid(row=1, column=0, columnspan=5)
+        
+        self.row = 2
+        self.afficher_adherents(Adherents)
+        self.columnconfigure((0, 1, 2, 3, 4), weight=1)
+
+    def afficher_adherents(self, adhrs):
+        Adherents = gestion.get_all_clients().values()
+        for widget in self.grid_slaves():
+            if int(widget.grid_info()["row"]) > 1:
+                widget.grid_forget()
+        
+        for elt in adhrs:
+            col = 0
+            for SudoElt in [elt.getCode(), elt.get_nom(), elt.get_prenomm(), str(elt.getDateDateAdhésion())]:
+                label = CTkLabel(self, text=str(SudoElt), justify="center", corner_radius=50, fg_color='transparent', pady=10)
+                label.grid(row=self.row, column=col)
+                col += 1
+            ButtonsFrame = CTkFrame(self, fg_color='transparent')
+            ButtonsFrame.grid(row=self.row, column=4)
+            Modifier = CTkLabel(ButtonsFrame, text='', justify="center", compound='center', anchor='center', cursor='hand2', image=editIcon)
+            Modifier.pack(side=LEFT, padx=5)
+            Supp = CTkLabel(ButtonsFrame, text='', justify="center", compound='center', anchor='center', cursor='hand2', image=deletIcon)
+            Supp.pack(side=RIGHT, padx=5)
+            Modifier.bind("<Button-1>", lambda e, code=elt.getCode(): self.modifier_adherent(code))
+            Supp.bind("<Button-1>", lambda e, code=elt.getCode(): self.supprimer_adhérent(code))
+            self.row += 1
+
+    def search_adherent(self, search_term):
+        Adherents = gestion.get_all_clients().values()
+        filtered_emprunts = [elt for elt in Adherents if search_term.lower() in str(elt.getCode()).lower() or search_term.lower() in str(elt.get_nom()).lower() or search_term.lower() in str(elt.get_prenomm()).lower()]
+        self.row = 2
+        self.afficher_adherents(filtered_emprunts)
+    def modifier_adherent(self, code):
+        Adherents = gestion.get_all_clients().values()
+        adherents_list = gestion.get_all_clients()
+        Adrnt = adherents_list[code]
+        nom = Adrnt.get_nom()
+        prenom = Adrnt.get_prenomm()
+        date_adhesion = Adrnt.getDateDateAdhésion()
+
+        self.modifier_window = CTkToplevel(self)
+        self.modifier_window.title("Modifier un Adhérent")
+
+        self.nom_label = CTkLabel(self.modifier_window, text="Nom:")
+        self.nom_label.grid(row=0, column=0, padx=10, pady=5)
+        self.nom_entry = CTkEntry(self.modifier_window)
+        self.nom_entry.insert(0, nom)
+        self.nom_entry.grid(row=0, column=1, padx=10, pady=5)
+
+        self.prenom_label = CTkLabel(self.modifier_window, text="Prénom:")
+        self.prenom_label.grid(row=1, column=0, padx=10, pady=5)
+        self.prenom_entry = CTkEntry(self.modifier_window)
+        self.prenom_entry.insert(0, prenom)
+        self.prenom_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.date_adhesion_label = CTkLabel(self.modifier_window, text="Date d'adhésion:")
+        self.date_adhesion_label.grid(row=2, column=0, padx=10, pady=5)
+        self.date_adhesion_entry = CTkEntry(self.modifier_window)
+        self.date_adhesion_entry.insert(0, date_adhesion)
+        self.date_adhesion_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        self.sauvegarder_button = CTkButton(self.modifier_window,fg_color=("#0078D7", "#005A9E"), text_color="#fff",
+                            hover_color=("#005A9E", "#004680"), corner_radius=8 ,text="Sauvegarder", command=lambda : self.Enrg(code))
+        self.sauvegarder_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+        
+    def Enrg(self, code):
+        Adherents = gestion.get_all_clients().values()
+        nom = self.nom_entry.get()
+        prenom = self.prenom_entry.get()
+        date_adhesion_str = self.date_adhesion_entry.get()
+
+        try:
+            date_adhesion = date.fromisoformat(date_adhesion_str)
+        except ValueError:
+            messagebox.showerror("Erreur", "Format de date invalide. Utilisez le format YYYY-MM-DD.")
+            return
+        if messagebox.askyesno('Modifier d\'un Adherent', f'Êtes-vous sûr de vouloir modifier cet adhérent N° {code} ?'):
+            try:
+                gestion.modifierAdherent(code, nom, prenom, date_adhesion)
+                self.afficher_adherents(Adherents)
+                self.modifier_window.destroy()
+                messagebox.showinfo('Succes', 'Les informations de l\'adhérent ont été mises à jour.')
+            except Exception as e:
+                messagebox.showerror('Erreur', str(e))
+                print(e)
+
+
+    def supprimer_adhérent(self, code):
+        Adherents = gestion.get_all_clients().values()
+        if messagebox.askyesno('Supprimer d\'un Adherent', f'Êtes-vous sûr de vouloir supprimer cet adhérent N° {code} ?'):
+            try:
+                gestion.supprimerAdherent(code)
+                self.afficher_adherents(Adherents)
+                messagebox.showinfo('Succes', 'Adherent supprime avec succes')
+            except Exception as e:
+                messagebox.showerror('Erreur', str(e))
+                print(e)
+
+
+
+addr = AdhrentsList(AdhrFrame)
+
+def on_search_adh(event):
+    keyword = searchInputAdh.get()
+    addr.search_adherent(keyword)
+
+searchInputAdh.bind("<KeyRelease>", on_search_adh)
+
+# Position
+searchFrameAdh.pack(side=TOP, fill=X, pady=0, padx=0)
+AdhrFrame.pack(side=TOP, fill=BOTH, expand=True, pady=(5, 5), padx=0)
+searchInputAdh.pack(side=LEFT, fill=X, expand=True, padx=0, pady=0)
+AddAdhr.pack(side=LEFT, expand=False, padx=(5, 0), pady=0)
 
 # -------Emprunts-------------------------------------------------------------------
 empruntsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
@@ -714,6 +854,54 @@ ajouterEmpruntContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 #-------Ajouter un adherent-------------------------------------------------------------------
 ajouterAdherentContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 ajouterAdherentContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+
+class AjouterAdhr(CTkFrame):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.pack(expand=True, pady=10, padx=20)
+        self.configure(fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+        
+        label_title = CTkLabel(self , text="Ajouter un Adherent", font=("Arial", 20, "bold"))
+        label_title.grid(row=0, column=0, columnspan=2, pady=10)
+        self.nom_label = CTkLabel(self, text="Nom:")
+        self.nom_label.grid(row=1, column=0, padx=10, pady=5)
+
+        self.nom_entry = CTkEntry(self)
+        self.nom_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        self.prenom_label = CTkLabel(self, text="Prénom:")
+        self.prenom_label.grid(row=2, column=0, padx=10, pady=5)
+
+        self.prenom_entry = CTkEntry(self)
+        self.prenom_entry.grid(row=2, column=1, padx=10, pady=5)
+
+        self.date_adhesion_label = CTkLabel(self, text="Date d'adhésion (YYYY-MM-DD):")
+        self.date_adhesion_label.grid(row=3, column=0, padx=10, pady=5)
+
+        self.date_adhesion_entry = DateEntry(self, date_pattern='yyyy-mm-dd', width=28, bad=2)
+        self.date_adhesion_entry.grid(row=3, column=1, padx=10, pady=5)
+
+        self.ajouter_button = CTkButton(self, text="Ajouter", fg_color=("#0078D7", "#005A9E"), text_color="#fff",
+                            hover_color=("#005A9E", "#004680"), corner_radius=8, command=self.Ajouter)
+        self.ajouter_button.grid(row=4, column=0, columnspan=2, pady=10)
+
+    def Ajouter(self):
+        nom = self.nom_entry.get()
+        prenom = self.prenom_entry.get()
+        date_adhesion_str = self.date_adhesion_entry.get_date()
+        if len(nom) == 0 or len(prenom) == 0:
+            messagebox.showerror("Erreur", 'Veuillez remplir tous les champs!')
+            return
+
+        try:
+            gestion.ajouterAdherent(nom, prenom, date_adhesion_str)
+            addr.afficher_adherents(gestion.get_all_clients().values())
+            messagebox.showinfo('Succes', 'Adherent a ete ajoute avec succes')
+        except Exception as e:
+            messagebox.showerror("Erreur", str(e))
+            return
+        
+AjtAdhr = AjouterAdhr(ajouterAdherentContent)
 
 #-------Paramètres-------------------------------------------------------------------
 parametresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)

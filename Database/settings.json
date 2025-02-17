@@ -2,5 +2,7 @@
     "login": "admin",
     "password": "admin",
     "theme": "light",
-    "zoom": 1
+    "zoom": 1,
+    "empruntPeriod" : 3,
+    "maxLivres" : 2
 }

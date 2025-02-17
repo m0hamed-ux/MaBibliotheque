@@ -6,9 +6,12 @@ class Adherent(Personne) :
     code = 1
     try:
         with open("Database/adherent.json", "r") as file:
-            # get last item code
-            print(json.load(file)[-1]["code"])
-            code = json.load(file)[-1]["code"] + 1
+            # get the max code
+            adherents = json.load(file)
+            if adherents:
+                code = max(adherent["code"] for adherent in adherents) + 1
+            else:
+                code = 1
     except (FileNotFoundError, json.JSONDecodeError):
         pass
     def __init__(self,nom,prenom,dateAdhesion, **kwargs):
@@ -29,9 +32,15 @@ class Adherent(Personne) :
         return self.__code
     def getDateDateAdhésion(self):
         return self.__DateAdhésion
+    def setDateAdhesion(self, dateAdhesion):
+        if not isinstance(dateAdhesion, date) or dateAdhesion > date.today():
+            raise Exception ("date inscription invalide")
+        else:
+            self.__DateAdhésion = dateAdhesion
+
     def to_dict(self):
         return {"nom": self.get_nom(), "prenom": self.get_prenomm(), "dateAdhesion": self.__DateAdhésion.strftime('%Y-%m-%d'), "code": self.__code}
-
+    
     @classmethod
     def from_dict(cls, data):
         return cls(data["nom"], data["prenom"], date.fromisoformat(data["dateAdhesion"]), code=data["code"])
