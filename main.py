@@ -29,6 +29,7 @@ def validate_login():
 login = CTk(fg_color="#CAF0F8")
 login.geometry("800x600")
 login.title("Login Page")
+login.iconbitmap("images/logo.ico")
 
 
 side_img = CTkImage(Image.open("images/logo.png"), size=(400, 350))

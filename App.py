@@ -16,7 +16,7 @@ from livre import *
 from tkinter import TOP, X
 import shutil
 import os
-# from test import AdhrentsList
+from FrameAdherent import Application
 
 
 
@@ -42,9 +42,11 @@ def defaultSettings():
         theme = data_dict["theme"]
         set_appearance_mode(theme)
         changeTheme(chart, theme,  7, "Database/Emprunts.txt")
+        update_menu_colors()
     except (FileNotFoundError, json.JSONDecodeError, KeyError):
         set_appearance_mode("light")
         changeTheme(chart, "light", 7, "Database/Emprunts.txt")
+        update_menu_colors()
 
 
 
@@ -127,7 +129,7 @@ def update_menu_colors():
     menubar.configure(background=bg_color, foreground=fg_color,
                       activebackground=active_bg, activeforeground=active_fg,
                       font=menu_font, borderwidth=0)
-    for menu in [file, edit, view, help_, mode, zoom]:
+    for menu in [file, view, help_, mode, zoom]:
         menu.configure(background=bg_color, foreground=fg_color,
                        activebackground=active_bg, activeforeground=active_fg,
                        font=menu_font, borderwidth=0, border=0)
@@ -878,7 +880,7 @@ class AjouterAdhr(CTkFrame):
         self.date_adhesion_label = CTkLabel(self, text="Date d'adhésion (YYYY-MM-DD):")
         self.date_adhesion_label.grid(row=3, column=0, padx=10, pady=5)
 
-        self.date_adhesion_entry = DateEntry(self, date_pattern='yyyy-mm-dd', width=28, bad=2)
+        self.date_adhesion_entry = DateEntry(self, date_pattern='yyyy-mm-dd', width=20, bad=2)
         self.date_adhesion_entry.grid(row=3, column=1, padx=10, pady=5)
 
         self.ajouter_button = CTkButton(self, text="Ajouter", fg_color=("#0078D7", "#005A9E"), text_color="#fff",
@@ -1041,15 +1043,6 @@ file.add_command(label='Enregistrer les emprunts csv', command=lambda: gestion.s
 file.add_command(label='Enregistrer les adherents csv', command=lambda: gestion.save_adherents_csv() & messagebox.showinfo("Enregistrement", "Les adherents ont ete enregistres avec succes"))
 file.add_separator()
 file.add_command(label='Quitter', command=app.destroy)
-
-edit = Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Editer', menu=edit)
-edit.add_command(label='Couper', command=None)
-edit.add_command(label='Copier', command=None)
-edit.add_command(label='Coller', command=None)
-edit.add_command(label='Selectionner tout', command=None)
-edit.add_separator()
-edit.add_command(label='Find...', command=None)
 
 view = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Voir', menu=view)

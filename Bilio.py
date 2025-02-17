@@ -154,9 +154,16 @@ class Biblio:
     def ajouterEmprunt(self, codeA, codeL):
         adherent = self.rechercherAdherent(int(codeA))
         livre = self.rechercherLivre(codeL)
+        with open("Database/settings.json", "r") as f:
+            settings = json.load(f)
+            print(settings)
+        active_emprunts = sum(1 for emprunt in self.__emprunts.values() if emprunt.getEmprunteurLivre().getCode() == int(codeA) and emprunt.etatEmprunt() == "en cours")
+        print(active_emprunts)
+        if active_emprunts >= settings['maxLivres']:
+            raise Exception("L'adherent a deja atteint le nombre maximum d'emprunts actifs")
         if livre and adherent and livre.LivreDisponible():
             dateEmprunt = date.today()
-            dateRetourPrevue = dateEmprunt + timedelta(days=3)
+            dateRetourPrevue = dateEmprunt + timedelta(days=settings['empruntPeriod'])
             emprunt = Emprunt(livre, adherent, dateEmprunt, dateRetourPrevue, dateREffective=None)
             self.__emprunts[emprunt.getCode()] = emprunt
             livre.set_nbr_exemplaire_disponible(livre.get_nbr_exemplaire_disponible()-1)

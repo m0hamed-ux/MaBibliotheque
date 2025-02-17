@@ -72,3 +72,11 @@ L'adherent PPP DDD a ete supprime le 17/02/2025
 L'adherent BBBB CCCC a ete supprime le 17/02/2025
 L'adherent TTest PPPO a ete supprime le 17/02/2025
 L'adherent test Ali a ete modifie le 17/02/2025
+L'adherent DDD DDD a ete ajoute le 17/02/2025
+L'adherent SSS DDD a ete modifie le 17/02/2025
+L'adherent SSS DDD a ete supprime le 17/02/2025
+L'adherent 1 a emprunte le livre L1234 le 17/02/2025
+L'adherent 1 a emprunte le livre L1234 le 17/02/2025
+L'adherent 1 a emprunte le livre L1234 le 17/02/2025
+L'adherent 1 a emprunte le livre L1234 le 17/02/2025
+L'adherent 1 a emprunte le livre L1234 le 17/02/2025
