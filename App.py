@@ -655,6 +655,7 @@ class AdhrentsList(CTkFrame):
 
         self.modifier_window = CTkToplevel(self)
         self.modifier_window.title("Modifier un Adhérent")
+        self.modifier_window.attributes("-topmost", True)
 
         self.nom_label = CTkLabel(self.modifier_window, text="Nom:")
         self.nom_label.grid(row=0, column=0, padx=10, pady=5)
@@ -1070,7 +1071,7 @@ class AjouterAdhr(CTkFrame):
 AjtAdhr = AjouterAdhr(ajouterAdherentContent)
 
 #-------Paramètres-------------------------------------------------------------------
-parametresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
+parametresContent = CTkScrollableFrame(mainContent, border_width=0, fg_color=mainColor)
 parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
 parametresTitle = CTkLabel(parametresContent, text="Paramètres", font=("Hubot Sans", 24, "bold"), text_color=("#03045E", "#FFFFFF"))
@@ -1106,49 +1107,92 @@ lightCmb = CTkRadioButton(themeFrame, text="Light mode", variable=themeVar, valu
 lightCmb.pack(side=TOP, anchor="w", pady=5)
 
 
-languageFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
-languageFrame.pack(side=TOP, fill=X, padx=20, pady=10)
-
-languageLabel = CTkLabel(languageFrame, text="Langue", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
-languageLabel.pack(side=TOP, anchor="w", pady=(0, 10))
-
-languageVar = StringVar(value="Français")
-
-def update_language():
-    language = languageVar.get()
-    messagebox.showinfo("Langue", f"Langue sélectionnée : {language}")
-
-CTkRadioButton(languageFrame, text="Français", variable=languageVar, value="Français", font=("Roboto", 14), command=update_language).pack(side=TOP, anchor="w", pady=5)
-CTkRadioButton(languageFrame, text="English", variable=languageVar, value="English", font=("Roboto", 14), command=update_language).pack(side=TOP, anchor="w", pady=5)
-
 accountFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
 accountFrame.pack(side=TOP, fill=X, padx=20, pady=10)
 
 accountLabel = CTkLabel(accountFrame, text="Paramètres du Compte", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
 accountLabel.pack(side=TOP, anchor="w", pady=(0, 10))
 
-usernameLabel = CTkLabel(accountFrame, text="Nom d'utilisateur", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
-usernameLabel.pack(side=TOP, anchor="w", pady=(0, 5))
+newPasswordLabel = CTkLabel(accountFrame, text="Nouveau mot de passe", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
+newPasswordLabel.pack(side=TOP, anchor="w", pady=(0, 5))
 
-usernameEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre nom d'utilisateur", width=300)
-usernameEntry.pack(side=TOP, anchor="w", pady=(0, 10))
+newPasswordEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre nouveau mot de passe", show="*", width=300)
+newPasswordEntry.pack(side=TOP, anchor="w", pady=(0, 10))
 
-passwordLabel = CTkLabel(accountFrame, text="Mot de passe", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
-passwordLabel.pack(side=TOP, anchor="w", pady=(0, 5))
+confirmPasswordLabel = CTkLabel(accountFrame, text="Confirmer le mot de passe", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
+confirmPasswordLabel.pack(side=TOP, anchor="w", pady=(0, 5))
 
-passwordEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Entrez votre mot de passe", show="*", width=300)
-passwordEntry.pack(side=TOP, anchor="w", pady=(0, 10))
+confirmPasswordEntry = CTkEntry(accountFrame, font=("Roboto", 14), placeholder_text="Confirmez votre nouveau mot de passe", show="*", width=300)
+confirmPasswordEntry.pack(side=TOP, anchor="w", pady=(0, 10))
 
 def save_account_settings():
-    username = usernameEntry.get()
-    password = passwordEntry.get()
-    if username and password:
-        messagebox.showinfo("Succès", "Paramètres du compte mis à jour avec succès!")
+    newPass = newPasswordEntry.get()
+    confirmPass = confirmPasswordEntry.get()
+    if newPass and confirmPass:
+        if newPass != confirmPass:
+            messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
+            return
+        if messagebox.askyesno("Confirmation", "Voulez-vous mettre à jour le mot de passe de votre compte?"):
+            with open("Database/settings.json", "r") as file:
+                data_dict = js.load(file)
+            data_dict["password"] = newPass
+            with open("Database/settings.json", "w") as file:
+                js.dump(data_dict, file, indent=4)
+            messagebox.showinfo("Succès", "Paramètres du compte mis à jour avec succès!")   
+            newPasswordEntry.delete(0, END)
+            confirmPasswordEntry.delete(0, END) 
     else:
         messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
 
-saveButton = CTkButton(accountFrame, text="Enregistrer", font=("Roboto", 14), fg_color="#00B4D8", hover_color="#90E0FF", command=save_account_settings)
+saveButton = CTkButton(accountFrame, text="Enregistrer", font=("Roboto", 14), text_color='white',fg_color="#00B4D8", hover_color="#90E0FF", command=save_account_settings)
 saveButton.pack(side=TOP, anchor="w", pady=(10, 0))
+
+EmpruntSettingsFrame = CTkFrame(parametresContent, fg_color=mainColor, border_width=0)
+EmpruntSettingsFrame.pack(side=TOP, fill=X, padx=20, pady=10)
+
+EmpruntSettingsLabel = CTkLabel(EmpruntSettingsFrame, text="Paramètres des Emprunts", font=("Hubot Sans", 18, "bold"), text_color=("#03045E", "#FFFFFF"))
+EmpruntSettingsLabel.pack(side=TOP, anchor="w", pady=(0, 10))
+
+EmprutPeriod = IntVar()
+MaxLivres = IntVar()
+
+with open("Database/settings.json", "r") as file:
+    data_dict = js.load(file)
+EmprutPeriod.set(int(data_dict["empruntPeriod"]))
+MaxLivres.set(int(data_dict["maxLivres"]))
+
+    
+
+EmpruntPeriodLabel = CTkLabel(EmpruntSettingsFrame, text="Période de pret par défaut (jours)", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
+EmpruntPeriodLabel.pack(side=TOP, anchor="w", pady=(0, 5))
+
+newPeriodEntry = CTkEntry(EmpruntSettingsFrame, font=("Roboto", 14), textvariable=EmprutPeriod, placeholder_text="Entrez la période", width=300)
+newPeriodEntry.pack(side=TOP, anchor="w", pady=(0, 10))
+
+MaxLivresLabel = CTkLabel(EmpruntSettingsFrame, text="Nombre maximum de livres pour chaque adhérent", font=("Roboto", 14), text_color=("#03045E", "#FFFFFF"))
+MaxLivresLabel.pack(side=TOP, anchor="w", pady=(0, 5))
+
+MaxLivresEntry = CTkEntry(EmpruntSettingsFrame, font=("Roboto", 14), textvariable=MaxLivres, placeholder_text="Entrez le nombre", width=300)
+MaxLivresEntry.pack(side=TOP, anchor="w", pady=(0, 10))
+
+def save_emprunt_settings():
+    newPeriod = newPeriodEntry.get()
+    newMaxLivres = MaxLivresEntry.get()
+    if newPeriod and newMaxLivres and int(newPeriod) > 0 and int(newMaxLivres) > 0:
+        if messagebox.askyesno("Confirmation", "Voulez-vous mettre à jour les paramètres des emprunts?"):
+            with open("Database/settings.json", "r") as file:
+                data_dict = js.load(file)
+            data_dict["empruntPeriod"] = int(newPeriod)
+            data_dict["maxLivres"] = InterruptedError(newMaxLivres)
+            with open("Database/settings.json", "w") as file:
+                js.dump(data_dict, file, indent=4)
+            messagebox.showinfo("Succès", "Paramètres des emprunts mis à jour avec succès!")   
+            newPeriodEntry.delete(0, END)
+            MaxLivresEntry.delete(0, END)
+saveEmpruntSettingsButton = CTkButton(EmpruntSettingsFrame, text="Enregistrer", font=("Roboto", 14), text_color='white', fg_color="#00B4D8", hover_color="#90E0FF", command=save_emprunt_settings)
+saveEmpruntSettingsButton.pack(side=TOP, anchor="w", pady=(10, 0))
+
+
 
 parametresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 
@@ -1232,7 +1276,7 @@ sideBarView.set(1)
 help_ = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Aide', menu=help_)
 help_.add_command(label='Aide', command=lambda : messagebox.showinfo("Aide", "Pour plus d'informations, contactez le support technique"))
-help_.add_command(label='A propos', command=lambda : messagebox.showinfo("A propos", "Gestionnaire de bibliotheque v1.0\nDéveloppé par : \n- EL KHAMLICHI Mohamed\n- EL ALAMI Alae ddin\n- MESBAHI Nour\n- TRIBAK Imane"))
+help_.add_command(label='A propos', command=lambda : messagebox.showinfo("A propos", "Gestionnaire de bibliotheque v1.0\nDéveloppé par : \n- EL KHAMLICHI Mohamed\n- EL ALAMI Alae ddin\n- MESBAHI Nour\n- TRIBAK Imane\n- AYA"))
 help_.add_command(label='Mise à jour', command=lambda : messagebox.showinfo("Mise à jour", "Vous utilisez la dernière version de l'application"))
 
 
