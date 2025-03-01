@@ -73,7 +73,6 @@ class Biblio:
 
         with open("Database/livres.json", "w") as f:
             json.dump(livres, f, indent=4)
-        # update recent activities
         f = open("Database/recentActivities.txt", "a")
         f.write(f"Le livre {lvr.get_titre()} a ete ajoute le {date.today().strftime('%d/%m/%Y')}\n")
         f.close()
@@ -285,6 +284,9 @@ class Biblio:
         livre.set_nbr_ttl_exemplaire(livre.get_nbr_ttl_exemplaire() + nbr_exemplaires)
         livre.set_nbr_exemplaire_disponible(livre.get_nbr_exemplaire_disponible() + nbr_exemplaires)
         self.save_data()
+        f = open("Database/recentActivities.txt", "a")
+        f.write(f"{nbr_exemplaires} exemplaires ajoutés pour le livre {livre.get_titre()} le {date.today().strftime('%d/%m/%Y')}\n")
+        f.close()
 
     def save_livres_csv(self):
         try:

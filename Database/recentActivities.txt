@@ -83,3 +83,4 @@ L'adherent 1 a emprunte le livre L1234 le 17/02/2025
 L'emprunt 25 a ete retourne le 17/02/2025
 Le livre Livre test a ete ajoute le 27/02/2025
 Le livre Livre test 3 a ete ajoute le 27/02/2025
+3 exemplaires ajoutés pour le livre The Subtle Art of Not Giving a F*ck le 01/03/2025

@@ -571,10 +571,11 @@ class LivresItem(CTkFrame):
             if nbr != "":
                 if int(nbr) > 0:
                     try:
-                        gestion.ajouter_exemplaire(livre.get_code(), int(nbr))
-                        self.refresh_dashboard_callback()
-                        messagebox.showinfo("Succes", "Exemplaire ajouté avec succes")
-                        lvrInfo.destroy()
+                        if messagebox.askyesno('Confirmation', f'Voulez-vous ajouter {nbr} exemplaires de {livre.get_titre()} ?', parent=lvrInfo):
+                            gestion.ajouter_exemplaire(livre.get_code(), int(nbr))
+                            self.refresh_dashboard_callback()
+                            messagebox.showinfo("Succes", "Exemplaire ajouté avec succes", parent=lvrInfo)
+                            lvrInfo.destroy()
                     except Exception as e:
                         messagebox.showerror("Erreur", str(e))
         nbrAj = IntVar()
@@ -1005,7 +1006,7 @@ def ajouter_emprunt():
     except Exception as e:
         messagebox.showerror("Erreur", f"Une erreur est survenue : {str(e)}")
 
-# Bouton pour ajouter un emprunt
+
 btn_ajouter = CTkButton(frame1, text="Ajouter Emprunt", command=ajouter_emprunt,
                             fg_color=("#0078D7", "#005A9E"), text_color="#fff",
                             hover_color=("#005A9E", "#004680"), corner_radius=8)
@@ -1230,7 +1231,10 @@ sideBarView.set(1)
 
 help_ = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Aide', menu=help_)
-help_.add_command(label='Aide', command=None)
+help_.add_command(label='Aide', command=lambda : messagebox.showinfo("Aide", "Pour plus d'informations, contactez le support technique"))
+help_.add_command(label='A propos', command=lambda : messagebox.showinfo("A propos", "Gestionnaire de bibliotheque v1.0\nDéveloppé par : \n- EL KHAMLICHI Mohamed\n- EL ALAMI Alae ddin\n- MESBAHI Nour\n- TRIBAK Imane"))
+help_.add_command(label='Mise à jour', command=lambda : messagebox.showinfo("Mise à jour", "Vous utilisez la dernière version de l'application"))
+
 
 app.config(menu=menubar)
 
