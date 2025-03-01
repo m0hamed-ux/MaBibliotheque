@@ -22,7 +22,6 @@ class Biblio:
         print(self.empruntPeriod)
         print(self.maxLivres)
     def load_data(self):
-        """Load data from JSON files, creating them if they don't exist"""
         try:
             with open("Database/adherent.json", "r") as f:
                 data = json.load(f)

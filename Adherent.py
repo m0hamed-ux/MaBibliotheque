@@ -6,7 +6,6 @@ class Adherent(Personne) :
     code = 1
     try:
         with open("Database/adherent.json", "r") as file:
-            # get the max code
             adherents = json.load(file)
             if adherents:
                 code = max(adherent["code"] for adherent in adherents) + 1

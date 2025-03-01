@@ -16,14 +16,12 @@ class Auteur(Personne):
             raise Exception("Code invalide")
     @classmethod
     def from_dict(cls, data):
-        """Create an Auteur instance from a dictionary"""
         return cls(
             nom=data["nom"],
             prenom=data["prenom"],
             code=data["code"]
         )
     def to_dict(self):
-        """Convert the author object to a dictionary"""
         return {
             "nom": self.get_nom(),
             "prenom": self.get_prenomm(),

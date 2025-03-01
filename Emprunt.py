@@ -91,8 +91,6 @@ class Emprunt:
     def from_dict(cls, data):
         return cls(
             livreEmprunte=livre.from_dict(data["livreEmprunte"]),
-            # get the code of the adherent from Adherent.json
-
             EmprunteurLivre=Adherent.from_dict(data["EmprunteurLivre"]),
             dateEmprunt=datetime.strptime(data["dateEmprunt"], '%Y-%m-%d').date(),
             dateRPrevue=datetime.strptime(data["dateRetourPrevue"], '%Y-%m-%d').date(),
