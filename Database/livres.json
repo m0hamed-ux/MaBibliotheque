@@ -7,8 +7,8 @@
             "prenom": "Mark",
             "code": "A1234"
         },
-        "nbr_ttl_exemplaire": 15,
-        "nbr_exemplaire_disponible": 7,
+        "nbr_ttl_exemplaire": 35,
+        "nbr_exemplaire_disponible": 27,
         "nbrEmprunt": 11
     },
     {
@@ -32,7 +32,55 @@
             "code": "A9900"
         },
         "nbr_ttl_exemplaire": 20,
-        "nbr_exemplaire_disponible": 17,
+        "nbr_exemplaire_disponible": 18,
         "nbrEmprunt": 3
+    },
+    {
+        "code": "L2222",
+        "titre": "Test2",
+        "auteur": {
+            "nom": "AAA",
+            "prenom": "BBB",
+            "code": "A9900"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 18,
+        "nbrEmprunt": 3
+    },
+    {
+        "code": "L2229",
+        "titre": "Test 4",
+        "auteur": {
+            "nom": "AAA",
+            "prenom": "BBB",
+            "code": "A9900"
+        },
+        "nbr_ttl_exemplaire": 20,
+        "nbr_exemplaire_disponible": 0,
+        "nbrEmprunt": 3
+    },
+    {
+        "code": "L9000",
+        "titre": "Livre test",
+        "auteur": {
+            "nom": "bbb",
+            "prenom": "ccc",
+            "code": "A8976"
+        },
+        "nbr_ttl_exemplaire": 10,
+        "nbr_exemplaire_disponible": 10,
+        "nbrEmprunt": 0
+    },
+    {
+        "code": "L9899",
+        "titre": "Livre test 3",
+        "auteur": {
+            "nom": "Aaa",
+            "prenom": "Bbb",
+            "code": "A9898"
+        },
+        "nbr_ttl_exemplaire": 10,
+        "nbr_exemplaire_disponible": 10,
+        "nbrEmprunt": 0
     }
 ]

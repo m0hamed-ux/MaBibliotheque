@@ -3,8 +3,8 @@ from tkinter import messagebox
 from tkcalendar import *
 from tkinter import ttk
 from customtkinter import *
-import PIL
-from PIL import ImageTk
+import PIL as PILimg
+from PIL import ImageTk, ImageDraw
 from Bilio import *
 import json
 import json as js
@@ -187,20 +187,20 @@ mainColor = ("#fff", "#09090b")
 btnActiveColor = ("#3fdfff", "#00b4d8")
 
 #Icons
-logoImage = CTkImage(PIL.Image.open("images/logo.png"), size=(30, 30))
-ThemeIcon = CTkImage(dark_image=PIL.Image.open("images/moon.png"),light_image=PIL.Image.open("images/sun.png") ,size=(20, 20))
-dashboardIcon = CTkImage(dark_image=PIL.Image.open("images/homeLight.png"),light_image=PIL.Image.open("images/home.png"), size=(15, 15))
-plusIcon = CTkImage(dark_image=PIL.Image.open("images/plusLight.png"),light_image=PIL.Image.open("images/plus.png"), size=(15, 15))
-plusIconLight = CTkImage(PIL.Image.open("images/plusLight.png"), size=(15, 15))
-bookIcon = CTkImage(dark_image=PIL.Image.open("images/bookLight.png"),light_image=PIL.Image.open("images/book.png"), size=(15, 15))
-clientsIcon = CTkImage(dark_image=PIL.Image.open("images/clientsLight.png"),light_image=PIL.Image.open("images/clients.png"), size=(15, 15))
-loanIcon = CTkImage(dark_image=PIL.Image.open("images/loanLight.png"),light_image=PIL.Image.open("images/loan.png"), size=(15, 15))
-settingsIcon = CTkImage(dark_image=PIL.Image.open("images/settingsLight.png"),light_image=PIL.Image.open("images/settings.png"), size=(15, 15))
-AddClientIcon = CTkImage(dark_image=PIL.Image.open("images/user-addLight.png"),light_image=PIL.Image.open("images/user-add.png"), size=(15, 15))
-expandIcon = CTkImage(dark_image=PIL.Image.open("images/sidebarLight.png"),light_image=PIL.Image.open("images/sidebar.png"), size=(20, 20))
-stockIcon = CTkImage(PIL.Image.open("images/stock.png"), size=(15, 15))
-exitIcon = CTkImage(PIL.Image.open("images/exit.png"), size=(15, 15))
-penIcon = CTkImage(PIL.Image.open("images/pen.png"), size=(20, 20))
+logoImage = CTkImage(PILimg.Image.open("images/logo.png"), size=(30, 30))
+ThemeIcon = CTkImage(dark_image=PILimg.Image.open("images/moon.png"),light_image=PILimg.Image.open("images/sun.png") ,size=(20, 20))
+dashboardIcon = CTkImage(dark_image=PILimg.Image.open("images/homeLight.png"),light_image=PILimg.Image.open("images/home.png"), size=(15, 15))
+plusIcon = CTkImage(dark_image=PILimg.Image.open("images/plusLight.png"),light_image=PILimg.Image.open("images/plus.png"), size=(15, 15))
+plusIconLight = CTkImage(PILimg.Image.open("images/plusLight.png"), size=(15, 15))
+bookIcon = CTkImage(dark_image=PILimg.Image.open("images/bookLight.png"),light_image=PILimg.Image.open("images/book.png"), size=(15, 15))
+clientsIcon = CTkImage(dark_image=PILimg.Image.open("images/clientsLight.png"),light_image=PILimg.Image.open("images/clients.png"), size=(15, 15))
+loanIcon = CTkImage(dark_image=PILimg.Image.open("images/loanLight.png"),light_image=PILimg.Image.open("images/loan.png"), size=(15, 15))
+settingsIcon = CTkImage(dark_image=PILimg.Image.open("images/settingsLight.png"),light_image=PILimg.Image.open("images/settings.png"), size=(15, 15))
+AddClientIcon = CTkImage(dark_image=PILimg.Image.open("images/user-addLight.png"),light_image=PILimg.Image.open("images/user-add.png"), size=(15, 15))
+expandIcon = CTkImage(dark_image=PILimg.Image.open("images/sidebarLight.png"),light_image=PILimg.Image.open("images/sidebar.png"), size=(20, 20))
+stockIcon = CTkImage(PILimg.Image.open("images/stock.png"), size=(15, 15))
+exitIcon = CTkImage(PILimg.Image.open("images/exit.png"), size=(15, 15))
+penIcon = CTkImage(PILimg.Image.open("images/pen.png"), size=(20, 20))
 
 
 
@@ -432,8 +432,159 @@ CTitleFrame.pack(side=TOP, fill=X, pady=(20,10), padx=20)
 
 # -------Livres-------------------------------------------------------------------
 
-livresContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
-livresContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
+def charger_lesimages():
+    with open("Database/images.json", "r", encoding="utf-8") as f:
+        images = json.load(f)
+    return images
+
+class LivresItem(CTkFrame):
+    def __init__(self, parent, refresh_dashboard_callback):
+        super().__init__(parent)
+        self.refresh_dashboard_callback = refresh_dashboard_callback
+        self.livres = gestion.get_livres()
+        self.images = charger_lesimages()
+
+        self.searchFrame = CTkFrame(self, bg_color=mainColor, fg_color=mainColor, corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        self.searchFrame.pack(side="top", fill="x", padx=0, pady=0)
+
+        self.searchInput = CTkEntry(self.searchFrame, placeholder_text="Rechercher un livre", fg_color=("#fff", "#1e1e1e"), corner_radius=7, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), height=35)
+        self.searchInput.pack(side="left", fill="x", expand=True, padx=0, pady=5)
+        self.searchInput.bind("<KeyRelease>", lambda event: self.search(event))
+
+
+        self.filterCombo = CTkComboBox(self.searchFrame, values=["tous", "disponible", "emprunté"], corner_radius=7, height=35, fg_color=("#e2e8f0", "#27272a"), button_color=("#e2e8f0", "#27272a"), button_hover_color="#515153", border_color=("#e2e8f0", "#27272a"),command=lambda x: self.filtrer(x))
+        self.filterCombo.pack(side="left", padx=5, pady=5)
+
+        self.livreFrame = CTkScrollableFrame(self, bg_color=mainColor, fg_color=mainColor, corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
+        self.livreFrame.pack(fill="both", expand=True, padx=0, pady=0)
+
+        self.afficher_livres(self.livres)
+    def afficher_livres(self, livres : dict[livre]):
+        for widget in self.livreFrame.winfo_children():
+            widget.destroy()
+
+        row = 0
+        column = 0
+        for livre in livres.values():
+            print(livres)
+            print(type(livre))
+            if column == 4:
+                column = 0
+                row += 1
+            frame = CTkFrame(self.livreFrame, corner_radius=10, border_width=0, bg_color=mainColor, fg_color=("#f0f0f0", "#2e2e2e"))
+            frame.grid(row=row, column=column, padx=5, pady=5)
+            self.livreFrame.columnconfigure(column, weight=1)
+            column += 1
+
+            image_path = "images/Books/No-Image-Placeholder.png"
+            for elt in self.images:
+                if elt["livreId"] == livre.get_code():
+                    image_path = elt["image"]
+                    print(image_path)
+                    break
+            if os.path.exists(image_path):
+                img = PILimg.Image.open(image_path)
+                photo = CTkImage(img, size=(250, 300))
+            else:
+                photo = None
+            if photo:
+                img_label = CTkLabel(frame, image=photo, text="")
+                img_label.image = photo
+                img_label.pack(pady=0, fill=X, expand=True)
+            if len(livre.get_titre()) > 20:
+                text = livre.get_titre()[:20] + "..."
+            else:
+                text = livre.get_titre()
+            CTkLabel(frame, text=text, font=("Arial", 14, "bold")).pack(pady=(0, 0))
+            CTkLabel(frame, text=f"De {livre.get_auteur().get_nom()} {livre.get_auteur().get_prenomm()}", font=("Arial", 12), text_color="#808080").pack(pady=0)
+
+
+            etat = f"{livre.get_nbr_exemplaire_disponible()} Disponible" if livre.LivreDisponible() else "Emprunté"
+            bg_color = "#77c67c" if livre.LivreDisponible() else "#ff1900"
+            CTkLabel(frame, text=etat, fg_color=bg_color, text_color='white', corner_radius=5).pack(pady=5)
+
+            CTkFrame(frame, height=2, width=250, bg_color=("#e2e8f0", "#27272a"), border_width=0, fg_color=("#e2e8f0", "#27272a")).pack(pady=5, fill=X, expand=True)
+            
+            eyeIcon = CTkImage(dark_image=PILimg.Image.open("images/eyeLight.png"),light_image=PILimg.Image.open("images/eye.png"), size=(15, 15))
+
+            
+            affiche_btn = CTkButton(frame, text="Voir plus", text_color=('black', 'white'), fg_color=("#f0f0f0", "#2e2e2e"), hover_color=("#f0f0f0", "#2e2e2e"), image=eyeIcon, compound="left", anchor="center", cursor="hand2", command=lambda livre=livre: self.AfficherLivre(livre))
+            affiche_btn.pack(pady=(0, 5), fill=X, expand=True)
+    def filtrer(self, etat):
+        print(etat)
+        if etat == "tous":
+            livres_filtres = self.livres
+        elif etat == "disponible":
+            livres_filtres = {key: livre for key, livre in self.livres.items() if livre.LivreDisponible()}
+            print(livres_filtres)
+        else:
+            livres_filtres = {key: livre for key, livre in self.livres.items() if not livre.LivreDisponible()}
+            print(livres_filtres)
+        self.afficher_livres(livres_filtres)
+    def search(self, event):
+        search = self.searchInput.get()
+        if search == "":
+            self.afficher_livres(self.livres)
+        else:
+            livres_filtres = {key: livre for key, livre in self.livres.items() if (search.lower() in livre.get_titre().lower()) or (search.lower() in str(livre.get_auteur()).lower()) or (search.lower() in str(livre.get_code()).lower())}
+            self.afficher_livres(livres_filtres)
+    def AfficherLivre(self, livre : livre):
+        lvrInfo = CTkToplevel()
+        lvrInfo.title(f"{livre.get_titre()}")
+        lvrInfo.resizable(False, False)
+        lvrInfo.attributes("-topmost", True)
+        infoFrame = CTkFrame(lvrInfo, bg_color=mainColor, fg_color=mainColor, corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        infoFrame.pack(fill="both", expand=True, padx=0, pady=0)
+
+        LvrtitleFrame = CTkFrame(infoFrame, bg_color=mainColor, fg_color=mainColor, corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        LvrtitleFrame.pack(side=TOP,fill="x", expand=False, padx=0, pady=0)
+        CTkLabel(LvrtitleFrame, text=f"{livre.get_titre()}", font=("Arial", 20, "bold")).pack(pady=(10, 0), padx=10, anchor="w")
+        CTkLabel(LvrtitleFrame, text=f"De {livre.get_auteur().get_nom()} {livre.get_auteur().get_prenomm()}", font=("Arial", 15), text_color="#808080").pack(pady=0, padx=10, anchor="w")
+        # image 
+        image_path = "images/Books/No-Image-Placeholder.png"
+        for elt in self.images:
+            if elt["livreId"] == livre.get_code():
+                image_path = elt["image"]
+                break
+        if os.path.exists(image_path):
+            img = PILimg.Image.open(image_path)
+            mask = PILimg.Image.new('L', img.size, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.rounded_rectangle([(0, 0), img.size], radius=20, fill=255)
+            img_rounded = PILimg.Image.new('RGBA', img.size, (0, 0, 0, 0))
+            img_rgba = img.convert('RGBA')
+            img_rounded.paste(img_rgba, (0, 0), mask=mask)
+            photo = CTkImage(light_image=img_rounded, dark_image=img_rounded, size=(150, 200))
+        if photo:
+            photoFrame = CTkFrame(infoFrame, bg_color=mainColor, fg_color=mainColor, corner_radius=0, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+            photoFrame.pack(side=LEFT, expand=FALSE, padx=0, pady=0)
+            img_label = CTkLabel(photoFrame, image=photo, text="")
+            img_label.image = photo
+            img_label.pack(padx=10, pady=(0, 10), fill=X, expand=False)
+        bookFrame = CTkFrame(infoFrame, bg_color=mainColor, fg_color=mainColor, corner_radius=10, border_width=0, border_color=("#e2e8f0", "#1e1e1e"))
+        bookFrame.pack(side=LEFT, fill=Y,expand=False, padx=0, pady=0)
+        CTkLabel(bookFrame, text=f"Code : {livre.get_code()}", font=("Arial", 15, "bold")).pack(pady=0, padx=0, anchor="w")
+        CTkLabel(bookFrame, text=f"Nombre d'exemplaires : {livre.get_nbr_ttl_exemplaire()}  ", font=("Arial", 15, "bold")).pack(pady=0, padx=0, anchor="w")
+        CTkLabel(bookFrame, text=f"Nombre d'exemplaires disponibles : {livre.get_nbr_exemplaire_disponible()}  ", font=("Arial", 15, "bold")).pack(pady=0, padx=0, anchor="w")
+        CTkLabel(bookFrame, text=f"Nombre d'emprunts : {livre.getNbrEmprunt()}  ", font=("Arial", 15, "bold")).pack(pady=0, padx=0, anchor="w")
+        def AjouterStock(nbr):
+            if nbr != "":
+                if int(nbr) > 0:
+                    try:
+                        gestion.ajouter_exemplaire(livre.get_code(), int(nbr))
+                        self.refresh_dashboard_callback()
+                        messagebox.showinfo("Succes", "Exemplaire ajouté avec succes")
+                        lvrInfo.destroy()
+                    except Exception as e:
+                        messagebox.showerror("Erreur", str(e))
+        nbrAj = IntVar()
+        CTkLabel(bookFrame, text="Ajouter des exemplaires : ", font=("Arial", 15), text_color='grey').pack(pady=(10, 0), padx=0, anchor="w")
+        CTkEntry(bookFrame, textvariable=nbrAj,placeholder_text="Quantite à ajouter", fg_color=("#fff", "#1e1e1e"), corner_radius=7, border_width=1, border_color=("#e2e8f0", "#1e1e1e"), height=35).pack(pady=4, padx=(0, 5), anchor="w", fill="x")
+        CTkButton(bookFrame, text='Ajouter', fg_color=('#000', '#1e1e1e'), corner_radius=7, border_width=0, border_color=("#e2e8f0", "#1e1e1e"), height=35, text_color="#fff",hover_color=('#515153','#515153'), compound='left', anchor='center', image=plusIconLight, cursor='hand2', command=lambda: AjouterStock(nbrAj.get())).pack(pady=(0, 5), padx=(0, 5), anchor="w", fill="x")
+        lvrInfo.mainloop()
+livresContent = LivresItem(mainContent, refresh_dashboard_callback=refreshDashboard)
+livresContent.pack(side="top", fill="both", expand=True, padx=0, pady=0)
+
 
 # -------Adherents-------------------------------------------------------------------
 adherentsContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
@@ -445,8 +596,8 @@ AddAdhr = CTkButton(searchFrameAdh, text='Ajouter', fg_color=('#000', '#1e1e1e')
 AdhrFrame = CTkScrollableFrame(adherentsContent, fg_color=("#fff", "#1e1e1e"), corner_radius=10, border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 
 
-editIcon = CTkImage(PIL.Image.open("images/edit.png"), size=(20, 20))
-deletIcon = CTkImage(PIL.Image.open("images/delet.png"), size=(20, 20))
+editIcon = CTkImage(PILimg.Image.open("images/edit.png"), size=(20, 20))
+deletIcon = CTkImage(PILimg.Image.open("images/delet.png"), size=(20, 20))
 
 class AdhrentsList(CTkFrame):
     def __init__(self, parent, **kwargs):
@@ -683,7 +834,7 @@ ajouterLivreContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
 frame2 = CTkFrame(ajouterLivreContent,corner_radius=10, fg_color=("#fff", "#1e1e1e"), border_width=1, border_color=("#e2e8f0", "#1e1e1e"))
 frame2.pack(pady=10, padx=20,expand=True)
 
-# Ajout de l'image
+
 image_label = CTkLabel(frame2, text="Aucune image sélectionnée", width=200, height=250)
 image_label.grid(row=0, column=0, rowspan=7, padx=20, pady=5)
 
@@ -693,12 +844,15 @@ images_folder = "images/Books"
 json_file = "Database/images.json"
 os.makedirs(images_folder, exist_ok=True)
 def choisir_image():
+    if entry_codee.get() == "":
+        messagebox.showerror("Erreur", "Veuillez entrer un code de livre avant de choisir une image")
+        return
     global selected_image_path
     filepath = filedialog.askopenfilename(filetypes=[("Images", "*.png;*.jpg;*.jpeg")])
     if filepath:
         selected_image_path = filepath
-        img = PIL.Image.open(filepath)
-        img = img.resize((150, 200),PIL.Image.LANCZOS)
+        img = PILimg.Image.open(filepath)
+        img = img.resize((150, 200),PILimg.Image.LANCZOS)
         img = ImageTk.PhotoImage(img)
         image_label.configure(image=img, text="")
         image_label.image = img
@@ -719,18 +873,16 @@ def choisir_image():
     else:
         images_data = []
 
-    #new data
     new_entry = {
         "livreId": entry_codee.get(),
-        "image": destination_path.replace("\\", "/")  # Normalize path
+        "image": destination_path.replace("\\", "/") 
     }
     images_data.append(new_entry)
 
-    # Save data
+    
     with open(json_file, "w", encoding="utf-8") as f:
         json.dump(images_data, f, indent=4, ensure_ascii=False)
 
-#fonction ajouter un livre
 def ajouterLivre():
     code = entry_codee.get()
     if not code:
@@ -740,22 +892,20 @@ def ajouterLivre():
     if not os.path.exists("Database"):
         os.makedirs("Database")
 
-    titre=entry_titre.get()
-    nomA=entry_nom.get()
-    prenomA=entry_prenom.get()
-    codeA=entry_code.get()
-    nbrTtl=entry_total.get()
-    nbrDispo=entry_disponible.get()
-
+    titre = entry_titre.get()
+    nomA = entry_nom.get()
+    prenomA = entry_prenom.get()
+    codeA = entry_code.get()
+    nbrTtl = entry_total.get()
+    nbrDispo = entry_disponible.get()
+    if not titre or not nomA or not prenomA or not codeA or not nbrTtl or not nbrDispo:
+        messagebox.showerror("Erreur", "Veuillez remplir tous les champs !")
+        return
 
     try:
-        lvr = livre(code, titre,Auteur(nomA,prenomA,codeA),int(nbrTtl),int(nbrDispo),nbrEmprunt=0)
-    except Exception as e:
-        messagebox.showerror("Erreur", e)
-    else:
+        lvr = livre(code, titre, Auteur(nomA, prenomA, codeA), int(nbrTtl), int(nbrDispo), nbrEmprunt=0)
         gestion.ajouterLivre(lvr)
         messagebox.showinfo("Succès", f"Le livre {titre} a été ajouté.")
-        refreshDashboard()
         entry_code.delete(0, "end")
         entry_nom.delete(0, "end")
         entry_codee.delete(0, "end")
@@ -763,11 +913,17 @@ def ajouterLivre():
         entry_total.delete(0, "end")
         entry_disponible.delete(0, "end")
         entry_titre.delete(0, "end")
-        image_label.configure(image="")
-        selected_image = None
+        image_label.configure(image="", text="Aucune image sélectionnée")
+        livresContent.images = charger_lesimages()
+        livresContent.afficher_livres(livresContent.livres)
+
+        refreshDashboard()
+
+    except Exception as e:
+        messagebox.showerror("Erreur", str(e))
 
 
-# Création des entrées
+
 CTkLabel(frame2, text="Code du livre:").grid(row=0, column=1, sticky="w", pady=(20,5))
 entry_codee = CTkEntry(frame2, placeholder_text="Code du livre", width=250)
 entry_codee.grid(row=0, column=2, padx=10, pady=(20,5))
@@ -796,15 +952,18 @@ CTkLabel(frame2, text="Nombre disponible:").grid(row=6, column=1, sticky="w")
 entry_disponible = CTkEntry(frame2, placeholder_text="Nombre disponible d'exemplaires", width=250)
 entry_disponible.grid(row=6, column=2, padx=10, pady=5)
 
-#Création des buttons
-ajouter_button = CTkButton(frame2, text="Ajouter un livre",fg_color=("#0078D7", "#005A9E"),corner_radius=8,  border_width=1,  border_color=("#A4C8E1", "#004680"),  height=36,  text_color="#fff",  hover_color=("#005A9E", "#004680"),compound="left",  anchor="center", command=ajouterLivre)
-ajouter_button.grid(row=8, column=0, columnspan=2, pady=30)
 
-image_button = CTkButton(frame2, text="Choisir une image",fg_color=("#0078D7", "#005A9E"),corner_radius=8,  border_width=1,  border_color=("#A4C8E1", "#004680"),  height=36,  text_color="#fff",  hover_color=("#005A9E", "#004680"),compound="left",  anchor="center", command=choisir_image)
-image_button.grid(row=8, column=1, columnspan=2, pady=30,padx=10)
 
-afficher_button = CTkButton(frame2, text="Afficher les livres",fg_color=("#0078D7", "#005A9E"),corner_radius=8,  border_width=1,  border_color=("#A4C8E1", "#004680"),  height=36,  text_color="#fff",  hover_color=("#005A9E", "#004680"),compound="left",  anchor="center", command=lambda: BtnColor("Livres") & updateMain("Livres"))
-afficher_button.grid(row=8, column=3, columnspan=2, pady=30,padx=(0,20))
+
+image_button = CTkButton(frame2, text="Choisir une image", fg_color=("#d3d3d3", "#a9a9a9"), corner_radius=8, border_width=0, border_color=("#A4C8E1", "#004680"), height=36, text_color="#fff", hover_color=("#005A9E", "#004680"), compound="left", anchor="center", command=choisir_image)
+image_button.grid(row=7, column=0, pady=5,padx=10)
+
+btnFrame = CTkFrame(frame2, fg_color='transparent')
+btnFrame.grid(row=8, column=0, columnspan=3, pady=(15, 5))
+ajouter_button = CTkButton(btnFrame, text="Ajouter un livre",fg_color=("#0078D7", "#005A9E"),corner_radius=8,  border_width=1,  border_color=("#A4C8E1", "#004680"),  height=36,  text_color="#fff",  hover_color=("#005A9E", "#004680"),compound="left",  anchor="center", command=ajouterLivre)
+ajouter_button.pack(side=LEFT, expand=True, padx=3)
+afficher_button = CTkButton(btnFrame, text="Afficher les livres",fg_color=("#0078D7", "#005A9E"),corner_radius=8,  border_width=1,  border_color=("#A4C8E1", "#004680"),  height=36,  text_color="#fff",  hover_color=("#005A9E", "#004680"),compound="left",  anchor="center", command=lambda: BtnColor("Livres") & updateMain("Livres"))
+afficher_button.pack(side=LEFT, expand=True, padx=3)
 ajouterLivreContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 #-------Ajouter un emprunt-------------------------------------------------------------------
 ajouterEmpruntContent = CTkFrame(mainContent, border_width=0, fg_color=mainColor)
@@ -815,19 +974,19 @@ frame1.pack(pady=10, padx=20,expand=True)
 label_title = CTkLabel(frame1, text="Ajouter un Emprunt", font=("Arial", 20, "bold"))
 label_title.pack(pady=10)
 
-# Entrée du code adhérent
+
 label_codeA = CTkLabel(frame1, text="Code Adhérent :", font=("Arial", 14))
 label_codeA.pack()
 entry_codeA = CTkEntry(frame1, width=250)
 entry_codeA.pack(pady=5,padx=50)
 
-# Entrée du code livre
+
 label_codeL = CTkLabel(frame1, text="Code Livre :", font=("Arial", 14))
 label_codeL.pack()
 entry_codeL = CTkEntry(frame1, width=250)
 entry_codeL.pack(pady=5,padx=50)
 
-# Fonction pour appeler ajouterEmprunt
+
 def ajouter_emprunt():
     codeA = entry_codeA.get().strip()
     codeL = entry_codeL.get().strip()
@@ -851,6 +1010,10 @@ btn_ajouter = CTkButton(frame1, text="Ajouter Emprunt", command=ajouter_emprunt,
                             fg_color=("#0078D7", "#005A9E"), text_color="#fff",
                             hover_color=("#005A9E", "#004680"), corner_radius=8)
 btn_ajouter.pack(pady=15)
+afficher_button = CTkButton(frame1, text="Afficher les Emprunts", fg_color=("#0078D7", "#005A9E"), text_color="#fff",
+                            hover_color=("#005A9E", "#004680"), corner_radius=8, command=lambda: BtnColor("Emprunts") & updateMain("Emprunts"))
+afficher_button.pack(pady=(0,15))
+
 
 ajouterEmpruntContent.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=0)
 #-------Ajouter un adherent-------------------------------------------------------------------
@@ -1061,7 +1224,7 @@ zoom.add_radiobutton(label="100%", variable=ZoomInt, value=1, command=lambda: se
 zoom.add_radiobutton(label="120%", variable=ZoomInt, value=1.2, command=lambda: set_widget_scaling(1.2))
 zoom.add_radiobutton(label="150%", variable=ZoomInt, value=1.5, command=lambda: set_widget_scaling(1.5))
 ZoomInt.set(1)
-view.add_cascade(label="Thème", menu=mode)
+view.add_cascade(label="Theme", menu=mode)
 view.add_cascade(label="Zoom", menu=zoom)
 sideBarView.set(1)
 

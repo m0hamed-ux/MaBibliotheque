@@ -80,3 +80,6 @@ L'adherent 1 a emprunte le livre L1234 le 17/02/2025
 L'adherent 1 a emprunte le livre L1234 le 17/02/2025
 L'adherent 1 a emprunte le livre L1234 le 17/02/2025
 L'adherent 1 a emprunte le livre L1234 le 17/02/2025
+L'emprunt 25 a ete retourne le 17/02/2025
+Le livre Livre test a ete ajoute le 27/02/2025
+Le livre Livre test 3 a ete ajoute le 27/02/2025

@@ -2,5 +2,33 @@
     {
         "livreId": "L0000",
         "image": "images/Books/f11ae2c319234c07f6b339bec1ea3d34.jpg"
+    },
+    {
+        "livreId": "L1111",
+        "image": "images/Books/f11ae2c319234c07f6b339bec1ea3d34.jpg"
+    },
+    {
+        "livreId": "L1234",
+        "image": "images/Books/f11ae2c319234c07f6b339bec1ea3d34.jpg"
+    },
+    {
+        "livreId": "L2222",
+        "image": "images/Books/f11ae2c319234c07f6b339bec1ea3d34.jpg"
+    },
+    {
+        "livreId": "L9000",
+        "image": "images/Books/1982179384.jpg"
+    },
+    {
+        "livreId": "L9899",
+        "image": "images/Books/0cee7e54fda8ac99ec11459448e89c7d.jpg"
+    },
+    {
+        "livreId": "",
+        "image": "images/Books/1982179384.jpg"
+    },
+    {
+        "livreId": "",
+        "image": "images/Books/0df90fb803aff4d8e757046305791b6a.jpg"
     }
 ]

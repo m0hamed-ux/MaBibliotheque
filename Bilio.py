@@ -278,6 +278,14 @@ class Biblio:
         return self.__emprunts.values()
     def TopLivres(self):
         return sorted(self.__livres.values(), key=lambda x: x.getNbrEmprunt(), reverse=True)
+    def ajouter_exemplaire(self, code, nbr_exemplaires):
+        livre = self.rechercherLivre(code)
+        if not livre:
+            raise Exception("Livre introuvable")
+        livre.set_nbr_ttl_exemplaire(livre.get_nbr_ttl_exemplaire() + nbr_exemplaires)
+        livre.set_nbr_exemplaire_disponible(livre.get_nbr_exemplaire_disponible() + nbr_exemplaires)
+        self.save_data()
+
     def save_livres_csv(self):
         try:
             with open("Database/CSV/livres.csv", "w", newline='', encoding='utf-8') as f:
